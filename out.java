@@ -1,9 +1,11 @@
+import nervoussystem.obj.*;
 import processing.opengl.*;
 
 float a;
 int NUM = 8;     
 float offset = PI/NUM;
 color[] colors = new color[NUM];
+boolean record = false;
 
 void setup() { 
   fullScreen(P3D);
@@ -21,6 +23,12 @@ void draw() {
   directionalLight(255,5,255,-1,0,0);
   pointLight(63, 127, 255, mouseX, mouseY, 200);
   spotLight(100, 100, 100, mouseX, mouseY, 200, 0, 0, -1, PI, 2);
+  
+   if (record) {
+    beginRecord("nervoussystem.obj.OBJExport", "PATH TO DIRECTORY"+millis()+".obj");
+  }
+ 
+  
   translate(width/2, height/2, -50);
   rotateX(mouseY / 100.0);
   rotateY(mouseX / 100.0);
@@ -33,5 +41,14 @@ void draw() {
     popMatrix();
   }
   
+  if (record) {
+    endRecord();
+    record = false;
+  }
+  
   a+=0.01;  
+}
+
+void mousePressed() {
+  record = true;
 }
