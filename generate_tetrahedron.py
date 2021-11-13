@@ -3,15 +3,10 @@ import copy
 import numpy as np
 import numpy.linalg as LP
 
-class Point:
-    def __init__(self, p):
-        self.x = p[0]
-        self.y = p[1]
-        self.z = p[2]
 
 class Tetra():
     def __init__(self, p0, p1, p2, p3):
-        self.point = [Point(p0), Point(p1), Point(p2), Point(p3)]
+        self.point = [p0, p1, p2, p3]
         self.isCreated = [0, 0, 0, 0]
         self.triangle = [[p0, p1, p2], [p0, p1, p3], [p0, p2, p3], [p1, p2, p3]]
         self.edge = [
@@ -80,7 +75,7 @@ def isIntersect (triangle, line):
 
 def isCollide (candidate_edges, candidate_triangles, tetra_set):
     ## 衝突判定
-    for j in range(0, len(tetra_set)):
+    for j in reversed(range(0, len(tetra_set))):
         target_tetra = tetra_set[j]
         for k in range(4):
             for l in range(3):
@@ -121,29 +116,29 @@ while len(tetra_set) < num:
             s = getTriangle(tetra_i, target) ##tetra_i上のtarget番目の三角形.
             
             ## ベクトルを作る
-            center = Point([(s[0].x + s[1].x + s[2].x) / 3, (s[0].y + s[1].y + s[2].y) / 3, (s[0].z + s[1].z + s[2].z) / 3]) ## 三角形の重心
-            left_point = tetra_i.point[target] ## 三角形sに含まれないtetra_iの頂点
-            vector = np.array([left_point.x - center.x, left_point.y - center.y, left_point.z - center.z]) ##頂点-重心
+            center = (np.array(s[0])+np.array(s[1])+np.array(s[2])) / 3 ## 三角形の重心
+            left_point = np.array(tetra_i.point[target]) ## 三角形sに含まれないtetra_iの頂点
+            vector = np.array(left_point - center) ##頂点-重心
 
             ## 頂点を作る
             k = random.uniform(0.7, 1.5) ##ベクトルに掛け合わされる定数
-            c_p = list(map(int, -1 * k * vector + [center.x, center.y, center.z])) ## candidate_point. 頂点候補（衝突判定によって棄却される可能性あり）
+            c_p = list(map(int, -1 * k * vector + center)) ## candidate_point. 頂点候補（衝突判定によって棄却される可能性あり）
             ## print(c_p)
             ## 新規に作成される辺候補のリスト
-            candidate_edges = [[[s[0].x, s[0].y, s[0].z] ,c_p], [[s[1].x, s[1].y, s[1].z] ,c_p], [[s[2].x, s[2].y, s[2].z] ,c_p]]
+            candidate_edges = [[s[0] ,c_p], [s[1] ,c_p], [s[2] ,c_p]]
             
             ## 新規に作成される面候補のリスト
             candidate_triangles = [
-                [[s[0].x, s[0].y, s[0].z], [s[1].x, s[1].y, s[1].z], c_p],
-                [[s[0].x, s[0].y, s[0].z], [s[2].x, s[2].y, s[2].z], c_p],
-                [[s[1].x, s[1].y, s[1].z], [s[2].x, s[2].y, s[2].z], c_p]
+                [s[0], s[1], c_p],
+                [s[0], s[2], c_p],
+                [s[1], s[2], c_p]
             ]
             
             if not isCollide(candidate_edges, candidate_triangles, tetra_set):
                 ## 判定をPassした場合 :
                 ## 四面体を生成 
                 new_point = c_p
-                new_tetra = Tetra([s[0].x, s[0].y, s[0].z], [s[1].x, s[1].y, s[1].z], [s[2].x, s[2].y, s[2].z], new_point)
+                new_tetra = Tetra(s[0], s[1], s[2], new_point)
                 new_tetra.isCreated[3] = 1 ##生成した時点で接してる四面体
                 ## 一覧に追加
                 tetra_set.append(new_tetra)

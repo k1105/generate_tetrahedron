@@ -7,6 +7,6 @@ for i in range(0, len(tetra_set)):
         print("beginShape();")
         s = getTriangle(tetra, j)
         for k in range(0, 3):
-            print("vertex("+str(s[k].x*c)+", "+str(s[k].y*c)+", "+str(s[k].z*c)+");")
+            print("vertex("+str(s[k][0]*c)+", "+str(s[k][1]*c)+", "+str(s[k][2]*c)+");")
         print("endShape();")
         print("\n")
