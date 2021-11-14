@@ -3,6 +3,7 @@ import copy
 import numpy as np
 import numpy.linalg as LP
 import itertools
+import time
 
 
 class Tetra():
@@ -121,6 +122,7 @@ def calcCircumsphere(point):
     return circumcenter, circumradius
 
 ####### MAIN #######
+start = time.time()
 
 ## 生成したい四面体の個数をここで指定:
 num = 100
@@ -271,7 +273,8 @@ while len(tetra_set) < num:
                 ## isCreatedを更新
                 tetra_set[i].isCreated[target] = 1
                 
-                print("processing...("+'{:.1f}'.format((len(tetra_set)-1)/num*100)+"%)")
+                print("\r"+"processing...("+'{:.1f}'.format((len(tetra_set)-1)/num*100)+"%)",end="")
                 if(len(tetra_set)-1 == num): break
 
-print("completed.")
+elapsed_time = time.time() - start
+print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
