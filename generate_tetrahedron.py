@@ -2,6 +2,7 @@ import random
 import copy
 import numpy as np
 import numpy.linalg as LP
+import itertools
 
 
 class Tetra():
@@ -18,6 +19,7 @@ class Tetra():
                         [p2, p3]
                     ]
         self.circumcenter, self.circumradius = calcCircumsphere([p0, p1, p2, p3])
+        
 
 def set2D(seq):
     ## 2次元配列を集合に変換する関数.
@@ -74,6 +76,7 @@ def isIntersect (triangle, line):
     return False
 
 def isCollide (candidate_tetra, tetra_set):
+    
     ## 衝突判定
     for j in reversed(range(0, len(tetra_set))):
         target_tetra = tetra_set[j]
@@ -121,6 +124,7 @@ def calcCircumsphere(point):
 
 ## 生成したい四面体の個数をここで指定:
 num = 100
+threshold = 20 ##くっつける頂点の距離の閾値. 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
 
 print('generate '+str(num)+' tetrahedron.')
 
@@ -158,14 +162,116 @@ while len(tetra_set) < num:
             
             if not isCollide(candidate_tetra, tetra_set):
                 ## 判定をPassした場合 :
-                ## 四面体を生成 
-                new_tetra = candidate_tetra
-                new_tetra.isCreated[3] = 1 ##生成した時点で接してる四面体
+                candidate_tetra.isCreated[3] = 1 ##生成した時点で接してる四面体
+                
+                ## merge処理
+                merged = False
+                
+                for target_tetra in tetra_set:
+                    if merged:
+                        break
+                        
+#                     print("candidate_triangle: ")
+#                     print([candidate_tetra.triangle[0], candidate_tetra.triangle[1], candidate_tetra.triangle[2], candidate_tetra.triangle[3]])
+#                     print("target_triangle: ")
+#                     print([target_tetra.triangle[0], target_tetra.triangle[1], target_tetra.triangle[2], target_tetra.triangle[3]])
+#                     print("candidate_points: ")
+#                     print(candidate_tetra.point)
+#                     print("target_points: ")
+#                     print(target_tetra.point)
+
+                    ## edgeは元々のままだと３次元配列. 重複するedgeを検出する処理のために2次元配列に平坦化.
+                    candidate_edges = tuple(map(list, (map(itertools.chain.from_iterable, candidate_tetra.edge))))
+                    target_edges = tuple(map(list, (map(itertools.chain.from_iterable, target_tetra.edge))))
+
+                    ## 共有する頂点の数を検出.
+                    ## 0 ... 四面体は接していない
+                    ## 1 ... 四面体は一点でのみ接する
+                    ## 2 ... 四面体は1辺を共有する
+                    ## 3 ... 四面体は1面を共有する
+                    if len(set2D(candidate_tetra.point) & set2D(target_tetra.point)) == 2: ## 1つの辺を共有する場合
+                        candidate_point = candidate_tetra.point[3] ## 末尾の頂点.
+                        ## くっつく可能性のある頂点 = 共有している辺以外の頂点２つ.　= 「candidate_tetraとtarget_tetraに共通しない要素」とtarget_tetraに共通する要素
+                        target_points = list(map(list, (set2D(candidate_tetra.point) ^ set2D(target_tetra.point)) & set2D(target_tetra.point)))
+
+                        
+                        ## 2つの四面体が共有する辺.
+                        shared_edge = list(map(list, set2D(candidate_tetra.point) & set2D(target_tetra.point)))
+
+                        for target_point in target_points:                            
+#                             print("target_point: ")
+#                            print(target_point)
+                            if LP.norm(np.array(target_point)-np.array(candidate_point)) < threshold: ##閾値以下の場合
+                                
+                                ##isCreatedの更新
+                                ## candidate_tetraにおける, candidate_point, 共通する辺の頂点から成る三角形の番号を取得
+                                candidate_updated = False
+                                target_updated = False
+                                
+                                for k in range(0, 4):
+                                    if len(set2D(candidate_tetra.triangle[k]) & set2D([shared_edge[0], shared_edge[1], candidate_point])) == 3:
+                                        candidate_tetra.isCreated[k] = 1
+                                        ## print("candidateのisCreated更新")
+                                        candidate_updated = True
+                                        break
+                                        
+                                if not candidate_updated: ## debug
+                                    print("error: Candidate's isCreated Not Updated.")
+                                    print("candidate_tetra.point: ")
+                                    print([candidate_tetra.point[0], candidate_tetra.point[1], candidate_tetra.point[2], candidate_tetra.point[3]])
+                                    print("target_tetra.point: ")
+                                    print([target_tetra.point[0], target_tetra.point[1], target_tetra.point[2], target_tetra.point[3]])
+                                    print("candidate_point: ")
+                                    print(candidate_point)
+                                    print("target_point: ")
+                                    print(target_point)
+                                    print("target_points: ")
+                                    print(target_points)
+                                    print("shared_edge: ")
+                                    print(shared_edge)
+                                    print("target_triangles: ")
+                                    print(target_tetra.triangle)
+                                    print("11/14 note: 低確率だが偶に新規で生成された頂点がtarget_tetraの頂点に元から一致していることがある.動作には影響しない")
+
+                                ## 既存の四面体における, target_point, 共通する辺の頂点から成る三角形の番号を取得
+                                for k in range(0, 4):
+                                    if len(set2D(target_tetra.triangle[k]) & set2D([shared_edge[0], shared_edge[1], target_point])) == 3: 
+                                        target_tetra.isCreated[k] = 1
+                                        ## print("targetのisCreated更新")
+                                        target_updated = True
+                                        break
+                                
+                                if not target_updated: ## debug
+                                    print("error: Target's isCreated Not Updated.")
+                                    print("candidate_tetra.point: ")
+                                    print([candidate_tetra.point[0], candidate_tetra.point[1], candidate_tetra.point[2], candidate_tetra.point[3]])
+                                    print("target_tetra.point: ")
+                                    print([target_tetra.point[0], target_tetra.point[1], target_tetra.point[2], target_tetra.point[3]])
+                                    print("candidate_point: ")
+                                    print(candidate_point)
+                                    print("target_point: ")
+                                    print(target_point)
+                                    print("target_points: ")
+                                    print(target_points)
+                                    print("shared_edge: ")
+                                    print(shared_edge)
+                                    print("target_triangles: ")
+                                    print(target_tetra.triangle)
+                                    
+                                candidate_tetra.point[3] = target_point
+                                ## print("merge")
+                                merged = True
+                                break
+                
+                
                 ## 一覧に追加
+                new_tetra = Tetra(candidate_tetra.point[0], candidate_tetra.point[1], candidate_tetra.point[2], candidate_tetra.point[3])
+                
                 tetra_set.append(new_tetra)
                 ## isCreatedを更新
                 tetra_set[i].isCreated[target] = 1
                 
                 print("processing...("+'{:.1f}'.format((len(tetra_set)-1)/num*100)+"%)")
+                if(len(tetra_set)-1 == num): break
 
 print("completed.")
