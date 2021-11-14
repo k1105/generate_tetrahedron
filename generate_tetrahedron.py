@@ -8,7 +8,7 @@ class Tetra():
     def __init__(self, p0, p1, p2, p3):
         self.point = [p0, p1, p2, p3]
         self.isCreated = [0, 0, 0, 0]
-        self.triangle = [[p0, p1, p2], [p0, p1, p3], [p0, p2, p3], [p1, p2, p3]]
+        self.triangle = [[p1, p2, p3], [p0, p2, p3], [p0, p1, p3], [p0, p1, p2]]
         self.edge = [
                         [p0, p1],
                         [p0, p2],
@@ -17,12 +17,12 @@ class Tetra():
                         [p1, p3],
                         [p2, p3]
                     ]
+        self.circumcenter, self.circumradius = calcCircumsphere([p0, p1, p2, p3])
 
-def getTriangle(tetra, num):
-    ## 四面体tetraに含まれる面numの情報を返す関数.
-    point_list = copy.copy(tetra.point) ##point_list=四面体tetraの持つ4つの頂点.
-    del point_list[num] ##point_listからnum番目の頂点を削除.→point_listは3つの頂点情報を持つ事になる=三角形の頂点.
-    return point_list
+def set2D(seq):
+    ## 2次元配列を集合に変換する関数.
+    ## ref: https://qiita.com/uuuno/items/b714d84ca2edbf16ea19
+    return set(map(tuple, seq))
 
 def isIntersect (triangle, line):
     ## triangleとlineが交差しているかの判定を行う関数.
@@ -34,7 +34,7 @@ def isIntersect (triangle, line):
     v1 = np.array(triangle[1])
     v2 = np.array(triangle[2])
     
-    if not(all(v0==origin) or all(v1==origin) or all(v2==origin) or all(v0==ray) or all(v1==ray) or all(v2==ray)):
+    if len(set2D([v0, v1, v2]) & set2D([origin, ray])) == 0:
         
         edge1 = v1 - v0
         edge2 = v2 - v0
@@ -73,22 +73,51 @@ def isIntersect (triangle, line):
     
     return False
 
-def isCollide (candidate_edges, candidate_triangles, tetra_set):
+def isCollide (candidate_tetra, tetra_set):
     ## 衝突判定
     for j in reversed(range(0, len(tetra_set))):
         target_tetra = tetra_set[j]
-        for k in range(4):
-            for l in range(3):
-                ## 新しく生成される辺と既存の面が交差するかどうかの判定
-                if isIntersect(target_tetra.triangle[k], candidate_edges[l]):
-                    return True
+        if LP.norm(candidate_tetra.circumcenter-target_tetra.circumcenter) <= target_tetra.circumradius + candidate_tetra.circumradius:
+            c_p = candidate_tetra.point
+            ## 新規に作成される辺候補のリスト
+            candidate_edges = [[c_p[0] ,c_p[3]], [c_p[1] ,c_p[3]], [c_p[2] ,c_p[3]]]
 
-        for m in range(6):
-            for n in range(3):
-                ## 新しく生成される面と既存の辺が交差するかどうかの判定
-                if isIntersect(candidate_triangles[n], target_tetra.edge[m]): 
-                    return True
+            ## 新規に作成される面候補のリスト
+            candidate_triangles = [
+                [c_p[0], c_p[1], c_p[3]],
+                [c_p[0], c_p[2], c_p[3]],
+                [c_p[1], c_p[2], c_p[3]]
+            ]
+
+            for k in range(4):
+                for l in range(3):
+                    ## 新しく生成される辺と既存の面が交差するかどうかの判定
+                    if isIntersect(target_tetra.triangle[k], candidate_edges[l]):
+                        return True
+
+            for m in range(6):
+                for n in range(3):
+                    ## 新しく生成される面と既存の辺が交差するかどうかの判定
+                    if isIntersect(candidate_triangles[n], target_tetra.edge[m]): 
+                        return True
     return False
+
+def calcCircumsphere(point):
+    ### 外接球の半径と外点を求める関数
+    p0 = np.array(point[0])
+    p1 = np.array(point[1])
+    p2 = np.array(point[2])
+    p3 = np.array(point[3])
+    matrix = [p0-p1, p0-p2, p2-p3]
+
+    ### 外接円の外点
+    circumcenter = 0.5 * np.dot(LP.inv(matrix) , [LP.norm(p0)**2-LP.norm(p1)**2, LP.norm(p0)**2-LP.norm(p2)**2, LP.norm(p2)**2-LP.norm(p3)**2])
+    ### 外接円の半径
+    circumradius = LP.norm(p0 - circumcenter)
+    
+    return circumcenter, circumradius
+
+####### MAIN #######
 
 ## 生成したい四面体の個数をここで指定:
 num = 100
@@ -113,7 +142,7 @@ while len(tetra_set) < num:
         target = random.randint(0, 3)
         
         if tetra_i.isCreated[target] == 0:
-            s = getTriangle(tetra_i, target) ##tetra_i上のtarget番目の三角形.
+            s = tetra_i.triangle[target] ##tetra_i上のtarget番目の三角形.
             
             ## ベクトルを作る
             center = (np.array(s[0])+np.array(s[1])+np.array(s[2])) / 3 ## 三角形の重心
@@ -124,21 +153,13 @@ while len(tetra_set) < num:
             k = random.uniform(0.7, 1.5) ##ベクトルに掛け合わされる定数
             c_p = list(map(int, -1 * k * vector + center)) ## candidate_point. 頂点候補（衝突判定によって棄却される可能性あり）
             ## print(c_p)
-            ## 新規に作成される辺候補のリスト
-            candidate_edges = [[s[0] ,c_p], [s[1] ,c_p], [s[2] ,c_p]]
             
-            ## 新規に作成される面候補のリスト
-            candidate_triangles = [
-                [s[0], s[1], c_p],
-                [s[0], s[2], c_p],
-                [s[1], s[2], c_p]
-            ]
+            candidate_tetra = Tetra(s[0], s[1], s[2], c_p)
             
-            if not isCollide(candidate_edges, candidate_triangles, tetra_set):
+            if not isCollide(candidate_tetra, tetra_set):
                 ## 判定をPassした場合 :
                 ## 四面体を生成 
-                new_point = c_p
-                new_tetra = Tetra(s[0], s[1], s[2], new_point)
+                new_tetra = candidate_tetra
                 new_tetra.isCreated[3] = 1 ##生成した時点で接してる四面体
                 ## 一覧に追加
                 tetra_set.append(new_tetra)
