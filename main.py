@@ -3,6 +3,8 @@ import numpy as np
 import numpy.linalg as LP
 import time
 from stl import mesh
+from module import TetraCollisionDetection as tcol
+from module import Set2D
 
 
 class Tetra():
@@ -20,92 +22,18 @@ class Tetra():
                     ]
         self.circumcenter, self.circumradius = calcCircumsphere([p0, p1, p2, p3])
         self.index = index
+
+    def findTriangleIndex(self, p0, p1, p2):
+        ## tetraが持つ三角形のうち、p0, p1, p2からなる三角形に一致するものを返す関数.
+        for index in range(0, 4):
+            ## print(self.triangle[index])
+            if len(Set2D.set2D(self.triangle[index]) & Set2D.set2D([p0, p1, p2])) == 3:
+                    return index
         
-
-def set2D(seq):
-    ## 2次元配列を集合に変換する関数.
-    ## ref: https://qiita.com/uuuno/items/b714d84ca2edbf16ea19
-    return set(map(tuple, seq))
-
-def isIntersect (triangle, line):
-    ## triangleとlineが交差しているかの判定を行う関数.
-    ## line: [重心, 頂点]
-    origin = np.array(line[0]) ## 線分の開始点
-    ray = np.array(line[1]) ## 線分の終点
-    invRay = -1 * ray ## 終点ベクトルの反対
-    v0 = np.array(triangle[0])
-    v1 = np.array(triangle[1])
-    v2 = np.array(triangle[2])
-    
-    if len(set2D([v0, v1, v2]) & set2D([origin, ray])) == 0:
-        
-        edge1 = v1 - v0
-        edge2 = v2 - v0
-
-        denominator = LP.det([edge1, edge2, invRay])
-
-        if denominator > 0 :
-            d = origin - v0
-            u = LP.det([d, edge2, invRay]) / denominator
-            if 0 <= u <= 2.5: ## note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
-                v = LP.det([edge1, d, invRay]) / denominator
-                if 0 <= v and u + v <= 2.5: ## note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
-                    t = LP.det([edge1, edge2, d]) / denominator
-
-                    ## 距離がマイナスの場合は交差していない
-                    if t >= 0 :
-                        return True
-
-        origin = np.array(line[1]) ## 線分の開始点
-        ray = np.array(line[0]) ## 線分の終点
-        invRay = -1 * ray ## 終点ベクトルの反対
-
-        denominator = LP.det([edge1, edge2, invRay])
-
-        if denominator > 0 :
-            d = origin - v0
-            u = LP.det([d, edge2, invRay]) / denominator
-            if 0 <= u <= 1.0: ## note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
-                v = LP.det([edge1, d, invRay]) / denominator
-                if 0 <= v and u + v <= 1.0: ## note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
-                    t = LP.det([edge1, edge2, d]) / denominator
-
-                    ## 距離がマイナスの場合は交差していない
-                    if t >= 0 :
-                        return True
-    
-    return False
-
-def isCollide (candidate_tetra, tetra_set):
-    
-    ## 衝突判定
-    for j in reversed(range(0, len(tetra_set))):
-        target_tetra = tetra_set[j]
-        ## 外接球を用いた大まかな衝突判定
-        if LP.norm(candidate_tetra.circumcenter-target_tetra.circumcenter) <= target_tetra.circumradius + candidate_tetra.circumradius:
-            c_p = candidate_tetra.point
-            ## 新規に作成される辺候補のリスト
-            candidate_edges = [[c_p[0] ,c_p[3]], [c_p[1] ,c_p[3]], [c_p[2] ,c_p[3]]]
-
-            ## 新規に作成される面候補のリスト
-            candidate_triangles = [
-                [c_p[0], c_p[1], c_p[3]],
-                [c_p[0], c_p[2], c_p[3]],
-                [c_p[1], c_p[2], c_p[3]]
-            ]
-
-            for k in range(4):
-                for l in range(3):
-                    ## 新しく生成される辺と既存の面が交差するかどうかの判定
-                    if isIntersect(target_tetra.triangle[k], candidate_edges[l]):
-                        return True
-
-            for m in range(6):
-                for n in range(3):
-                    ## 新しく生成される面と既存の辺が交差するかどうかの判定
-                    if isIntersect(candidate_triangles[n], target_tetra.edge[m]): 
-                        return True
-    return False
+        ## 上のreturnが実行されなかった場合 = p0, p1, p2からなる三角形は存在しない
+        print("error: there's no triangle in tetra: "+str([p0, p1, p2]))
+        print("tetra's point: "+str(self.point))
+        return -1
 
 def calcCircumsphere(point):
     ### 外接球の半径と外点を求める関数
@@ -121,18 +49,6 @@ def calcCircumsphere(point):
     circumradius = LP.norm(p0 - circumcenter)
     
     return circumcenter, circumradius
-
-def findTriangleIndex(tetra, p0, p1, p2):
-    ## tetraが持つ三角形のうち、p0, p1, p2からなる三角形に一致するものを返す関数.
-    for index in range(0, 4):
-        ## print(tetra.triangle[index])
-        if len(set2D(tetra.triangle[index]) & set2D([p0, p1, p2])) == 3:
-                return index
-    
-    ## 上のreturnが実行されなかった場合 = p0, p1, p2からなる三角形は存在しない
-    print("error: there's no triangle in tetra: "+str([p0, p1, p2]))
-    print("tetra's point: "+str(tetra.point))
-    return -1
 
 ####### MAIN #######
 start = time.time()
@@ -189,13 +105,13 @@ while len(tetra_set) < num:
                 ## 1 ... 四面体は一点でのみ接する
                 ## 2 ... 四面体は1辺を共有する
                 ## 3 ... 四面体は1面を共有する
-                if len(set2D(candidate_tetra.point) & set2D(target_tetra.point)) == 2: ## 1つの辺を共有する場合
+                if len(Set2D.set2D(candidate_tetra.point) & Set2D.set2D(target_tetra.point)) == 2: ## 1つの辺を共有する場合
                     candidate_point = candidate_tetra.point[3] ## 末尾の頂点.
                     ## くっつく可能性のある頂点 = 共有している辺以外の頂点２つ.　= 「candidate_tetraとtarget_tetraに共通しない要素」とtarget_tetraに共通する要素
-                    target_points = list(map(list, (set2D(candidate_tetra.point) ^ set2D(target_tetra.point)) & set2D(target_tetra.point)))
+                    target_points = list(map(list, (Set2D.set2D(candidate_tetra.point) ^ Set2D.set2D(target_tetra.point)) & Set2D.set2D(target_tetra.point)))
 
                     ## 2つの四面体が共有する辺.
-                    shared_edge = list(map(list, set2D(candidate_tetra.point) & set2D(target_tetra.point)))
+                    shared_edge = list(map(list, Set2D.set2D(candidate_tetra.point) & Set2D.set2D(target_tetra.point)))
 
                     ## 発生率はかなり低いが, 稀にcandidate_pointがshared_edgeに含まれる
                     ## =新規で作成された頂点が既存の他の頂点にたまたま一致することがある.
@@ -204,10 +120,10 @@ while len(tetra_set) < num:
 
                         for target_point in target_points:
                             ## print("target")
-                            target_triangle_index = findTriangleIndex(target_tetra, shared_edge[0], shared_edge[1], target_point)
+                            target_triangle_index = target_tetra.findTriangleIndex(shared_edge[0], shared_edge[1], target_point)
                             if target_tetra.isCreated[target_triangle_index] == 0: ##merge先になる可能性のある四面体におけるisCreatedのチェック.
                                 if LP.norm(np.array(target_point)-np.array(candidate_point)) < threshold: ##閾値以下の場合
-                                    candidate_triangle_index = findTriangleIndex(candidate_tetra, shared_edge[0], shared_edge[1], candidate_point)
+                                    candidate_triangle_index = candidate_tetra.findTriangleIndex(shared_edge[0], shared_edge[1], candidate_point)
                                     candidate_tetra.point[3] = target_point
                                     connected_tetra = target_tetra
                                     merged = True
@@ -217,7 +133,7 @@ while len(tetra_set) < num:
             
            # print("\r"+"processing...("+'{:.1f}'.format(len(tetra_set)/num*100)+"%) | check collision of tetra (from: "+str(target_tetra.index)+")" ,end="")
                 
-            if not isCollide(candidate_tetra, tetra_set):
+            if not tcol.isCollide(candidate_tetra, tetra_set):
                 ## 判定をPassした場合 :
                 candidate_tetra.isCreated[3] = 1 ##生成した時点で接してる四面体
                 tetra_set[i].isCreated[target] = 1
