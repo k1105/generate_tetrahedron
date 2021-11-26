@@ -37,7 +37,7 @@ $ cd generate_tetrahedron
 $ pip install -r requirements.txt
 ```
 
-### 2 回目移行
+### 2 回目以降
 
 1. github 上でシステムの更新が行われている可能性があるので, 毎回初めに pull してくる.
 
@@ -62,7 +62,7 @@ $ python {filename}.py
 ## ファイル構成
 
 - main.py
-  = ランダムな四面体生成を行い, 生成された形状(stl 形式), processing で出力する用のコード(txt 形式: comming soon..)及び, 各四面体の関係をネットワーク図で表現したグラフ(png 形式: comming soon..)を出力する.
+  = ランダムな四面体生成を行い, 生成された形状(stl 形式), processing で出力する用のコード(txt 形式: comming soon..)及び, 各四面体の関係をネットワーク図で表現したグラフ(png 形式)を出力する.
 
 - module/Set2D.py
   = 2 次元配列を集合に変換する関数.
