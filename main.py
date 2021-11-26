@@ -2,9 +2,12 @@ import random
 import numpy as np
 import numpy.linalg as LP
 import time
+import os
+import datetime
 from stl import mesh
 from module import TetraCollisionDetection as tcol
 from module import Set2D
+from graphviz import Digraph
 
 
 class Tetra():
@@ -54,8 +57,8 @@ def calcCircumsphere(point):
 start = time.time()
 edges = []
 ## 生成したい四面体の個数をここで指定:
-num = 200
-threshold = 40 ##くっつける頂点の距離の閾値. 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
+num = int(input('生成する四面体の個数-> '))
+threshold = int(input('くっつける頂点の距離の閾値->')) ##2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
 
 print('generate '+str(num)+' tetrahedron.')
 
@@ -157,3 +160,51 @@ while len(tetra_set) < num:
 
 elapsed_time = time.time() - start
 print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
+
+vertices = []
+faces = []
+
+## stl生成
+print('generating stl file...')
+for tetra in tetra_set:
+    for i in range(0, 4):
+        if tetra.isCreated[i] == 0:
+            face = []
+            for point in tetra.triangle[i]:
+                if not point in vertices:
+                    vertices.append(point)
+                face.append(vertices.index(point))
+            faces.append(face)
+
+# メッシュ（物体）作成
+vertices = np.array(vertices)
+faces = np.array(faces)
+obj= mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
+for i, f in enumerate(faces):
+    for j in range(3):
+        obj.vectors[i][j] = vertices[f[j],:]
+
+
+#Y軸方向に90度回転
+#obj.rotate([0.0, 1.0, 0.0], math.radians(90))
+
+# 保存
+now = datetime.datetime.now()
+dir_path = 'out/'+now.strftime('%Y%m%d_%H%M%S')
+os.mkdir(dir_path)
+obj.save(dir_path+'/'+now.strftime('%Y%m%d_%H%M%S')+'.stl')
+
+print('completed.')
+
+## グラフ生成
+print('generating graph...')
+G = Digraph(format="png")
+G.attr("node", shape="circle")
+
+for tetra in tetra_set:
+    if tetra.isCreated == [1, 1, 1, 1]:
+        G.node(str(tetra.index), fillcolor="#ccddff", style="filled")
+
+for i,j in edges:
+    G.edge(str(i) , str(j))
+G.render(dir_path+'/'+now.strftime('%Y%m%d_%H%M%S'))
