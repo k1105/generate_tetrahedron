@@ -7,10 +7,6 @@ import datetime
 from stl import mesh
 from module import TetraCollisionDetection as tcol
 from module import Set2D
- 
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-
 from graphviz import Digraph
 
 
