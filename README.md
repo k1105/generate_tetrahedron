@@ -24,14 +24,14 @@ $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/
 
 python は,[progate のサイト](https://prog-8.com/docs/python-env)を参考にインストール.
 
-1.  github からこのリポジトリをローカルに clone し, clone したディレクトリに移動.
+2.  github からこのリポジトリをローカルに clone し, clone したディレクトリに移動.
 
 ```bash
 $ git clone git@github.com:k1105/generate_tetrahedron.git
 $ cd generate_tetrahedron
 ```
 
-1. システムを実行するのに必要なライブラリをまとめてインストールするため, 以下を実行.
+3. システムを実行するのに必要なライブラリをまとめてインストールするため, 以下を実行.
 
 ```bash
 $ pip install -r requirements.txt
@@ -45,7 +45,7 @@ $ pip install -r requirements.txt
 $ git pull origin master
 ```
 
-1. システムを実行するのに必要なライブラリも増えている可能性があるので, 以下を実行.
+2. システムを実行するのに必要なライブラリも増えている可能性があるので, 以下を実行.
 
 ```bash
 $ pip install -r requirements.txt
@@ -61,5 +61,11 @@ $ python {filename}.py
 
 ## ファイル構成
 
-- generate_tetrahedron.py
-  = ランダムな四面体生成を行い, 生成された形状(stl 形式), processing で出力する用のコード(txt 形式)及び, 各四面体の関係をネットワーク図で表現したグラフ(png 形式)を出力する.
+- main.py
+  = ランダムな四面体生成を行い, 生成された形状(stl 形式), processing で出力する用のコード(txt 形式: comming soon..)及び, 各四面体の関係をネットワーク図で表現したグラフ(png 形式: comming soon..)を出力する.
+
+- module/Set2D.py
+  = 2 次元配列を集合に変換する関数.
+
+- module/TetraCollisionDetection.py
+  = 四面体の衝突判定に必要な関数を持つモジュール.
