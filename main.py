@@ -209,7 +209,7 @@ for i, f in enumerate(faces):
 # 保存
 now = datetime.datetime.now()
 dir_path = 'out/'+now.strftime('%Y%m%d_%H%M%S')
-os.mkdir(dir_path)
+os.makedirs(dir_path)
 obj.save(dir_path+'/'+now.strftime('%Y%m%d_%H%M%S')+'.stl')
 
 print('completed.')
