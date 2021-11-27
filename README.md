@@ -2,6 +2,8 @@
 
 Boxcel の考え方を拡張させ, 四面体を一つの単位として形状生成を行うプログラム.既に生成された四面体の面から新しい四面体をランダムで生成する操作を繰り返すことで, 総体としてもランダムな形状を作る.
 
+<img width="1440" alt="スクリーンショット 2021-11-19 11 25 27" src="https://user-images.githubusercontent.com/47634358/143669165-e5aff56c-34bd-4b53-a717-212d1de08c02.png">
+
 ## 使用方法
 
 ### 初期設定
@@ -63,6 +65,9 @@ $ python {filename}.py
 
 - main.py
   = ランダムな四面体生成を行い, 生成された形状(stl 形式), processing で出力する用のコード(txt 形式: comming soon..)及び, 各四面体の関係をネットワーク図で表現したグラフ(png 形式)を出力する.
+  
+![image](https://user-images.githubusercontent.com/47634358/143669189-2bb7d877-f817-4e0e-9b90-51475638ef2a.png)
+
 
 - module/Set2D.py
   = 2 次元配列を集合に変換する関数.
