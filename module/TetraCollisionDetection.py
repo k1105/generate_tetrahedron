@@ -23,10 +23,10 @@ def isIntersect(triangle, line):
         if denominator > 0:
             d = origin - v0
             u = LP.det([d, edge2, invRay]) / denominator
-            if 0 <= u <= 2.5:  # note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
+            if 0 <= u <= 1.5:  # note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
                 v = LP.det([edge1, d, invRay]) / denominator
                 # note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
-                if 0 <= v and u + v <= 2.5:
+                if 0 <= v and u + v <= 1.5:
                     t = LP.det([edge1, edge2, d]) / denominator
 
                     # 距離がマイナスの場合は交差していない
@@ -42,10 +42,10 @@ def isIntersect(triangle, line):
         if denominator > 0:
             d = origin - v0
             u = LP.det([d, edge2, invRay]) / denominator
-            if 0 <= u <= 1.0:  # note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
+            if 0 <= u <= 1.5:  # note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
                 v = LP.det([edge1, d, invRay]) / denominator
                 # note: ここをいくつの値に設定するかで全体の形状に影響を与えそう.
-                if 0 <= v and u + v <= 1.0:
+                if 0 <= v and u + v <= 1.5:
                     t = LP.det([edge1, edge2, d]) / denominator
 
                     # 距離がマイナスの場合は交差していない
