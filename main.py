@@ -8,6 +8,8 @@ from stl import mesh
 from module import TetraCollisionDetection as tcol
 from module import PlaneIntersectionDetection as pint
 from module import Set2D
+from module import SelectTarget as star
+from module import GenerateVertex as gver
 from graphviz import Digraph
 
 
@@ -83,29 +85,16 @@ while len(tetra_set) < num:
 
         # i 番目の四面体情報をもとに新しい四面体を作成
         # 面を選ぶ
-        target = random.randint(0, 3)
+        target = star.SelectTarget()
 
         if tetra_i.isCreated[target] == 0:
             s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
-
-            # ベクトルを作る
-            center = (np.array(s[0])+np.array(s[1]) +
-                      np.array(s[2])) / 3  # 三角形の重心
-            # 三角形sに含まれないtetra_iの頂点
-            left_point = np.array(tetra_i.point[target])
-            vector = np.array(left_point - center)  # 頂点-重心
-
-            # 頂点を作る
-            k = random.uniform(0.7, 1.5)  # ベクトルに掛け合わされる定数
-            # candidate_point. 頂点候補（衝突判定によって棄却される可能性あり）
-            c_p = list(map(int, -1 * k * vector + center))
-            # print(c_p)
+            c_p = gver.GenerateVertex(s, np.array(tetra_i.point[target]))
 
             candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetra_set))
             connected_tetra = None
 
             # merge処理 開始
-           # print("check close tetra (from: "+str(target_tetra.index)+")")
             merged = False
 
             for target_tetra in tetra_set:
