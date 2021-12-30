@@ -58,7 +58,7 @@ def isIntersect(triangle, line):
 def isCollide(candidate_tetra, tetra_set):
 
     # 衝突判定
-    for j in reversed(range(0, len(tetra_set))):
+    for j in reversed(range(len(tetra_set))):
         target_tetra = tetra_set[j]
         # 外接球を用いた大まかな衝突判定
         if LP.norm(candidate_tetra.circumcenter-target_tetra.circumcenter) <= target_tetra.circumradius + candidate_tetra.circumradius:
