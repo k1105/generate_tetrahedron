@@ -30,10 +30,13 @@ class Tetra():
         self.circumcenter, self.circumradius = calcCircumsphere(
             [p0, p1, p2, p3])
         self.index = index
+        self.childVertex = [None, None, None, None]
+        self.centroid = (np.array(p0) + np.array(p1) +
+                         np.array(p2) + np.array(p3)) / 4
 
     def findTriangleIndex(self, p0, p1, p2):
         # tetraが持つ三角形のうち、p0, p1, p2からなる三角形に一致するものを返す関数.
-        for index in range(0, 4):
+        for index in range(4):
             # print(self.triangle[index])
             if len(Set2D.set2D(self.triangle[index]) & Set2D.set2D([p0, p1, p2])) == 3:
                 return index
@@ -42,6 +45,18 @@ class Tetra():
         print("error: there's no triangle in tetra: "+str([p0, p1, p2]))
         print("tetra's point: "+str(self.point))
         return -1
+
+    def calculateNeighbor(self):
+        sum = [0, 0, 0]
+        for i in range(4):
+            if self.childVertex[i] != None:  # 生成されていた場合
+                s = self.triangle[i]
+                c = (s[0] + s[1] + s[2]) / 3
+                p = self.childVertex[i]
+                vec = p - c
+                sum += vec
+
+        return sum
 
 
 def calcCircumsphere(point):
@@ -79,7 +94,7 @@ tetra_set = []
 tetra_set.append(tetra)
 
 while len(tetra_set) < num:
-    for i in range(0, len(tetra_set)):
+    for i in range(len(tetra_set)):
         # i 番目の四面体情報を取得
         tetra_i = tetra_set[i]
 
@@ -175,7 +190,7 @@ faces = []
 # stl生成
 print('generating stl file...')
 for tetra in tetra_set:
-    for i in range(0, 4):
+    for i in range(4):
         if tetra.isCreated[i] == 0:
             face = []
             for point in tetra.triangle[i]:
