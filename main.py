@@ -188,7 +188,6 @@ while len(tetra_set) < num:
 
                 print("\r"+"processing...(" +
                       '{:.1f}'.format(len(tetra_set)/num*100)+"%)", end="")
-                print(candidate_tetra.calculateNeighbor())
 
             if(len(tetra_set) == num):
                 break
