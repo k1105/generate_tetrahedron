@@ -51,12 +51,15 @@ class Tetra():
         for i in range(4):
             if self.childVertex[i] != None:  # 生成されていた場合
                 s = self.triangle[i]
-                c = (s[0] + s[1] + s[2]) / 3
+                c = (np.array(s[0]) + np.array(s[1]) + np.array(s[2])) / 3
                 p = self.childVertex[i]
                 vec = p - c
                 sum += vec
 
         return sum
+
+    def setChildVertex(self, index, vertex):
+        self.childVertex[index] = vertex
 
 
 def calcCircumsphere(point):
@@ -106,7 +109,9 @@ while len(tetra_set) < num:
             s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
             c_p = gver.GenerateVertex(s, np.array(tetra_i.point[target]))
 
+            # マージ処理を実施する前の四面体.
             candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetra_set))
+            # マージ処理によってcandidate_tetraと結合した四面体.
             connected_tetra = None
 
             # merge処理 開始
@@ -158,14 +163,20 @@ while len(tetra_set) < num:
             if not tcol.isCollide(candidate_tetra, tetra_set):
                 # 判定をPassした場合 :
                 candidate_tetra.isCreated[3] = 1  # 生成した時点で接してる四面体
+                candidate_tetra.setChildVertex(3, tetra_set[i].point[target])
                 tetra_set[i].isCreated[target] = 1
+                tetra_set[i].setChildVertex(target, candidate_tetra.point[3])
 
                 edges.append((tetra_i.index, candidate_tetra.index))
 
                 if connected_tetra is not None:
                     if candidate_triangle_index != -1 and target_triangle_index != -1:
                         candidate_tetra.isCreated[candidate_triangle_index] = 1
+                        candidate_tetra.setChildVertex(
+                            candidate_triangle_index, tetra_set[connected_tetra.index].point[target_triangle_index])
                         tetra_set[connected_tetra.index].isCreated[target_triangle_index] = 1
+                        tetra_set[connected_tetra.index].setChildVertex(
+                            target_triangle_index, candidate_tetra.point[candidate_triangle_index])
                         edges.append(
                             (connected_tetra.index, candidate_tetra.index))
 
