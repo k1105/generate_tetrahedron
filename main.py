@@ -6,7 +6,7 @@ import os
 import datetime
 from stl import mesh
 from module import TetraCollisionDetection as tcol
-from module import PlaneIntersectionDetection as pint
+from module import TriangleIntersectionDetection as tint
 from module import Set2D
 from module import SelectTarget as star
 from module import GenerateVertex as gver
@@ -146,7 +146,7 @@ while len(tetra_set) < num:
                             target_triangle_index = target_tetra.findTriangleIndex(
                                 shared_edge[0], shared_edge[1], target_point)
                             # merge先になる可能性のある四面体におけるisCreatedのチェック.
-                            if target_tetra.isCreated[target_triangle_index] == 0 and not pint.isIntersectToPlane(candidate_tetra.triangle[3], candidate_point, target_point):
+                            if target_tetra.isCreated[target_triangle_index] == 0 and not tint.isIntersectToTriangle(candidate_tetra.triangle[3], [candidate_point, target_point]):
                                 # 閾値以下、かつマージ後の頂点が四面体の裏側に回ってないか判定.
                                 if LP.norm(np.array(target_point)-np.array(candidate_point)) < threshold:
                                     candidate_triangle_index = candidate_tetra.findTriangleIndex(
