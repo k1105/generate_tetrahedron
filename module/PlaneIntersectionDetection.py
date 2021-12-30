@@ -27,5 +27,4 @@ def isIntersectToPlane(points, p0, p1):
             # 距離がマイナスの場合は交差していない
             if t >= 0:
                 return True
-
     return False
