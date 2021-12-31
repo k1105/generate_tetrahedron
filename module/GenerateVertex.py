@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import math
 
 
 def GenerateVertex(tetra, tetras, target, k):
@@ -10,6 +11,11 @@ def GenerateVertex(tetra, tetras, target, k):
     input = k * tetra.getNeighborInformationVector()+(1 - k) * \
         tetra.getPositionInformationVector(
             tetras)  # 入力ベクトル. 注目要素の近傍情報ベクトルと位置情報ベクトルのそれぞれにk, 1-k倍をして算出.
+
+    # 0 < theta < 2pi
+    theta = math.atan2(input[1], input[0]) + math.pi
+    # -pi/2 < phi < pi/2
+    phi = (math.atan2(input[2], input[1]) + math.pi) % math.pi - math.pi / 2
 
     # ベクトルを作る
     center = (np.array(triangle[0])+np.array(triangle[1]) +
