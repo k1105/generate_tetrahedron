@@ -58,12 +58,12 @@ class Tetra():
 
         return sum
 
-    def getPositionInformationVector(self, tetra_set):
+    def getPositionInformationVector(self, tetras):
         vert = np.array([0, 0, 0])
         d = LP.norm(self.centroid - vert)
         e = (self.centroid - vert) / d
         d_max = 0
-        for tetra in tetra_set:
+        for tetra in tetras:
             d_cand = LP.norm(tetra.centroid - vert)
             if d_max < d_cand:
                 d_max = d_cand
@@ -103,15 +103,15 @@ print('generate '+str(num)+' tetrahedron.')
 # 最初の四面体を作成
 tetra = Tetra([10, 10, 10], [-10, -10, 10], [10, -10, -10], [-10, 10, -10], 0)
 
-tetra_set = []
+tetras = []
 
 # 配列に追加
-tetra_set.append(tetra)
+tetras.append(tetra)
 
-while len(tetra_set) < num:
-    for i in range(len(tetra_set)):
+while len(tetras) < num:
+    for i in range(len(tetras)):
         # i 番目の四面体情報を取得
-        tetra_i = tetra_set[i]
+        tetra_i = tetras[i]
 
         # i 番目の四面体情報をもとに新しい四面体を作成
         # 面を選ぶ
@@ -119,17 +119,17 @@ while len(tetra_set) < num:
 
         if tetra_i.isCreated[target] == 0:
             s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
-            c_p = gver.GenerateVertex(tetra_i, tetra_set, target)
+            c_p = gver.GenerateVertex(tetra_i, tetras, target)
 
             # マージ処理を実施する前の四面体.
-            candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetra_set))
+            candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetras))
             # マージ処理によってcandidate_tetraと結合した四面体.
             connected_tetra = None
 
             # merge処理 開始
             merged = False
 
-            for target_tetra in tetra_set:
+            for target_tetra in tetras:
                 if merged:
                     break
 
@@ -170,14 +170,14 @@ while len(tetra_set) < num:
 
             # merge処理 終了
 
-           # print("\r"+"processing...("+'{:.1f}'.format(len(tetra_set)/num*100)+"%) | check collision of tetra (from: "+str(target_tetra.index)+")" ,end="")
+           # print("\r"+"processing...("+'{:.1f}'.format(len(tetras)/num*100)+"%) | check collision of tetra (from: "+str(target_tetra.index)+")" ,end="")
 
-            if not tcol.isCollide(candidate_tetra, tetra_set):
+            if not tcol.isCollide(candidate_tetra, tetras):
                 # 判定をPassした場合 :
                 candidate_tetra.isCreated[3] = 1  # 生成した時点で接してる四面体
-                candidate_tetra.setChildVertex(3, tetra_set[i].point[target])
-                tetra_set[i].isCreated[target] = 1
-                tetra_set[i].setChildVertex(target, candidate_tetra.point[3])
+                candidate_tetra.setChildVertex(3, tetras[i].point[target])
+                tetras[i].isCreated[target] = 1
+                tetras[i].setChildVertex(target, candidate_tetra.point[3])
 
                 edges.append((tetra_i.index, candidate_tetra.index))
 
@@ -185,9 +185,9 @@ while len(tetra_set) < num:
                     if candidate_triangle_index != -1 and target_triangle_index != -1:
                         candidate_tetra.isCreated[candidate_triangle_index] = 1
                         candidate_tetra.setChildVertex(
-                            candidate_triangle_index, tetra_set[connected_tetra.index].point[target_triangle_index])
-                        tetra_set[connected_tetra.index].isCreated[target_triangle_index] = 1
-                        tetra_set[connected_tetra.index].setChildVertex(
+                            candidate_triangle_index, tetras[connected_tetra.index].point[target_triangle_index])
+                        tetras[connected_tetra.index].isCreated[target_triangle_index] = 1
+                        tetras[connected_tetra.index].setChildVertex(
                             target_triangle_index, candidate_tetra.point[candidate_triangle_index])
                         edges.append(
                             (connected_tetra.index, candidate_tetra.index))
@@ -196,12 +196,12 @@ while len(tetra_set) < num:
                 new_tetra = Tetra(candidate_tetra.point[0], candidate_tetra.point[1],
                                   candidate_tetra.point[2], candidate_tetra.point[3], candidate_tetra.index)
                 new_tetra.isCreated = candidate_tetra.isCreated
-                tetra_set.append(new_tetra)
+                tetras.append(new_tetra)
 
                 print("\r"+"processing...(" +
-                      '{:.1f}'.format(len(tetra_set)/num*100)+"%)", end="")
+                      '{:.1f}'.format(len(tetras)/num*100)+"%)", end="")
 
-            if(len(tetra_set) == num):
+            if(len(tetras) == num):
                 break
 
 elapsed_time = time.time() - start
@@ -212,7 +212,7 @@ faces = []
 
 # stl生成
 print('generating stl file...')
-for tetra in tetra_set:
+for tetra in tetras:
     for i in range(4):
         if tetra.isCreated[i] == 0:
             face = []
@@ -247,7 +247,7 @@ print('generating graph...')
 G = Digraph(format="png")
 G.attr("node", shape="circle")
 
-for tetra in tetra_set:
+for tetra in tetras:
     if tetra.isCreated == [1, 1, 1, 1]:
         G.node(str(tetra.index), fillcolor="#ccddff", style="filled")
 

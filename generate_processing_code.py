@@ -1,8 +1,8 @@
 # 生成された四面体の頂点情報の出力(Processingで出力可能)
 c = 5  # 出力時のスケール
 
-for i in range(0, len(tetra_set)):
-    tetra = tetra_set[i]
+for i in range(0, len(tetras)):
+    tetra = tetras[i]
     for j in range(0, 4):
         print("beginShape();")
         s = tetra.triangle[j]

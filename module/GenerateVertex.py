@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 
-def GenerateVertex(tetra, tetra_set, target):
+def GenerateVertex(tetra, tetras, target):
 
     triangle = tetra.triangle[target]
     left_point = np.array(tetra.point[target])
