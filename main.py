@@ -56,11 +56,13 @@ class Tetra():
                 vec = p - c
                 sum += vec
 
-        return sum
+        return np.array(sum)
 
     def getPositionInformationVector(self, tetras):
         vert = np.array([0, 0, 0])
         d = LP.norm(self.centroid - vert)
+        if d == 0:  # NOTE: d == 0の場合のハンドリングについては要検討. 現在暫定的に３次の0ベクトルを返している.
+            return np.array([0, 0, 0])
         e = (self.centroid - vert) / d
         d_max = 0
         for tetra in tetras:
@@ -68,7 +70,7 @@ class Tetra():
             if d_max < d_cand:
                 d_max = d_cand
 
-        return (d_max - d) * e
+        return np.array((d_max - d) * e)
 
     def setChildVertex(self, index, vertex):
         self.childVertex[index] = vertex
@@ -96,7 +98,8 @@ start = time.time()
 edges = []
 # 生成したい四面体の個数をここで指定:
 num = int(input('生成する四面体の個数-> '))
-threshold = int(input('くっつける頂点の距離の閾値->'))  # 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
+threshold = int(input('くっつける頂点の距離の閾値-> '))  # 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
+k = float(input('合成比率(0<k<1)-> '))
 
 print('generate '+str(num)+' tetrahedron.')
 
@@ -119,7 +122,7 @@ while len(tetras) < num:
 
         if tetra_i.isCreated[target] == 0:
             s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
-            c_p = gver.GenerateVertex(tetra_i, tetras, target)
+            c_p = gver.GenerateVertex(tetra_i, tetras, target, k)
 
             # マージ処理を実施する前の四面体.
             candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetras))
