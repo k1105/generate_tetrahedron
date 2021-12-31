@@ -3,7 +3,7 @@ import random
 import math
 
 
-def GenerateVertex(tetra, tetras, target, k):
+def GenerateVertex(tetra, tetras, target, k, random_list):
 
     triangle = tetra.triangle[target]
     left_point = np.array(tetra.point[target])
@@ -19,6 +19,9 @@ def GenerateVertex(tetra, tetras, target, k):
 
     theta_num = int(theta / (math.pi/4)) + 1
     phi_num = int((phi + math.pi / 2) / (math.pi / 4)) + 1
+
+    print(str(theta_num) + ' -> ' + str(random_list["theta"][theta_num-1]))
+    print(str(phi_num) + ' -> ' + str(random_list["phi"][phi_num-1]))
 
     # ベクトルを作る
     center = (np.array(triangle[0])+np.array(triangle[1]) +
