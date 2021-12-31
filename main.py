@@ -46,7 +46,7 @@ class Tetra():
         print("tetra's point: "+str(self.point))
         return -1
 
-    def calculateNeighbor(self):
+    def getNeighborInformationVector(self):
         sum = [0, 0, 0]
         for i in range(4):
             if self.childVertex[i] != None:  # 生成されていた場合
@@ -57,6 +57,18 @@ class Tetra():
                 sum += vec
 
         return sum
+
+    def getPositionInformationVector(self, tetra_set):
+        vert = np.array([0, 0, 0])
+        d = LP.norm(self.centroid - vert)
+        e = (self.centroid - vert) / d
+        d_max = 0
+        for tetra in tetra_set:
+            d_cand = LP.norm(tetra.centroid - vert)
+            if d_max < d_cand:
+                d_max = d_cand
+
+        return (d_max - d) * e
 
     def setChildVertex(self, index, vertex):
         self.childVertex[index] = vertex
@@ -107,7 +119,7 @@ while len(tetra_set) < num:
 
         if tetra_i.isCreated[target] == 0:
             s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
-            c_p = gver.GenerateVertex(s, np.array(tetra_i.point[target]))
+            c_p = gver.GenerateVertex(tetra_i, tetra_set, target)
 
             # マージ処理を実施する前の四面体.
             candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetra_set))

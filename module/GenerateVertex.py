@@ -2,7 +2,10 @@ import numpy as np
 import random
 
 
-def GenerateVertex(triangle, left_point):
+def GenerateVertex(tetra, tetra_set, target):
+
+    triangle = tetra.triangle[target]
+    left_point = np.array(tetra.point[target])
 
     # ベクトルを作る
     center = (np.array(triangle[0])+np.array(triangle[1]) +
