@@ -2,11 +2,11 @@ import numpy.linalg as LP
 from . import TriangleIntersectionDetection as tint
 
 
-def isCollide(candidate_tetra, tetra_set):
+def isCollide(candidate_tetra, tetras):
 
     # 衝突判定
-    for j in reversed(range(len(tetra_set))):
-        target_tetra = tetra_set[j]
+    for j in reversed(range(len(tetras))):
+        target_tetra = tetras[j]
         # 外接球を用いた大まかな衝突判定
         if LP.norm(candidate_tetra.circumcenter-target_tetra.circumcenter) <= target_tetra.circumradius + candidate_tetra.circumradius:
             c_p = candidate_tetra.point
