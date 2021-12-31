@@ -17,6 +17,9 @@ def GenerateVertex(tetra, tetras, target, k):
     # -pi/2 < phi < pi/2
     phi = (math.atan2(input[2], input[1]) + math.pi) % math.pi - math.pi / 2
 
+    theta_num = int(theta / (math.pi/4)) + 1
+    phi_num = int((phi + math.pi / 2) / (math.pi / 4)) + 1
+
     # ベクトルを作る
     center = (np.array(triangle[0])+np.array(triangle[1]) +
               np.array(triangle[2])) / 3  # 三角形の重心
