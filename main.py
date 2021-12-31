@@ -103,6 +103,13 @@ k = float(input('合成比率(0<k<1)-> '))
 
 print('generate '+str(num)+' tetrahedron.')
 
+theta_list = [1, 2, 3, 4, 5, 6, 7, 8]
+random.shuffle(theta_list)
+phi_list = [1, 2, 3, 4]
+random.shuffle(phi_list)
+
+random_list = {"theta": theta_list, "phi": phi_list}
+
 # 最初の四面体を作成
 tetra = Tetra([10, 10, 10], [-10, -10, 10], [10, -10, -10], [-10, 10, -10], 0)
 
@@ -122,7 +129,7 @@ while len(tetras) < num:
 
         if tetra_i.isCreated[target] == 0:
             s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
-            c_p = gver.GenerateVertex(tetra_i, tetras, target, k)
+            c_p = gver.GenerateVertex(tetra_i, tetras, target, k, random_list)
 
             # マージ処理を実施する前の四面体.
             candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetras))
