@@ -2,6 +2,7 @@ import numpy as np
 import random
 import math
 import numpy.linalg as LP
+from . import TriangleIntersectionDetection as tint
 
 
 def GenerateVertex(tetra, tetras, target, k, random_list):
@@ -28,8 +29,32 @@ def GenerateVertex(tetra, tetras, target, k, random_list):
     out_theta = theta + random_list["theta"][theta_num-1] * pi / 4
     out_phi = phi + random_list["phi"][phi_num-1] * pi / 8
 
-    output = input_norm * np.array([math.cos(out_phi)*math.cos(out_theta),
-                                    math.cos(out_phi)*math.sin(out_theta), math.sin(out_phi)])
+    output = [tetra.centroid, input_norm * np.array([math.cos(out_phi)*math.cos(out_theta),
+                                                     math.cos(out_phi)*math.sin(out_theta), math.sin(out_phi)]) + tetra.centroid]
+
+    intersectionPlane = -1
+
+    for i in range(0, 4):
+        if tint.isIntersectToTriangle(tetra.triangle[i], output, "half-line"):
+            intersectionPlane = i
+            break
+
+    if intersectionPlane == -1 and input_norm != 0:
+        ## どの平面とも交差せず, またベクトルの大きさが0でなかった場合
+        print('error!')
+        print("triangles: \n"
+              + str(tetra.triangle[0]) + "\n"
+              + str(tetra.triangle[1]) + "\n"
+              + str(tetra.triangle[2]) + "\n"
+              + str(tetra.triangle[3]))
+        print("line: \n"
+              + str(output))
+        print("output_theta: \n"
+              + str(out_theta))
+        print("output_phi: \n"
+              + str(out_phi))
+        print("norm: \n"
+              + str(input_norm))
 
     # ベクトルを作る
     center = (np.array(triangle[0])+np.array(triangle[1]) +
