@@ -15,6 +15,11 @@ from graphviz import Digraph
 
 class Tetra():
     def __init__(self, p0, p1, p2, p3, index):
+        p0 = list(p0)
+        p1 = list(p1)
+        p2 = list(p2)
+        p3 = list(p3)
+
         self.point = [p0, p1, p2, p3]
         self.isCreated = [0, 0, 0, 0]
         self.triangle = [[p1, p2, p3], [
@@ -41,7 +46,7 @@ class Tetra():
             if len(Set2D.set2D(self.triangle[index]) & Set2D.set2D([p0, p1, p2])) == 3:
                 return index
 
-        ## 上のreturnが実行されなかった場合 = p0, p1, p2からなる三角形は存在しない
+        # 上のreturnが実行されなかった場合 = p0, p1, p2からなる三角形は存在しない
         print("error: there's no triangle in tetra: "+str([p0, p1, p2]))
         print("tetra's point: "+str(self.point))
         return -1
@@ -59,7 +64,8 @@ class Tetra():
         return np.array(sum)
 
     def getPositionInformationVector(self, tetras):
-        vert = np.array([0, 0, 0])
+        vert = np.array([random.uniform(-100, 100),
+                        random.uniform(-100, 100), random.uniform(-100, 100)])
         d = LP.norm(self.centroid - vert)
         if d == 0:  # NOTE: d == 0の場合のハンドリングについては要検討. 現在暫定的に３次の0ベクトルを返している.
             return np.array([0, 0, 0])
@@ -73,7 +79,8 @@ class Tetra():
         return np.array((d_max - d) * e)
 
     def setChildVertex(self, index, vertex):
-        self.childVertex[index] = vertex
+        # print(type(vertex))
+        self.childVertex[index] = list(vertex)
 
 
 def calcCircumsphere(point):
@@ -95,14 +102,54 @@ def calcCircumsphere(point):
 
 ####### MAIN #######
 start = time.time()
-edges = []
 # 生成したい四面体の個数をここで指定:
-num = int(input('生成する四面体の個数-> '))
+num = int(input('生成する四面体の個数(>2) -> '))
 threshold = int(input('くっつける頂点の距離の閾値-> '))  # 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
 k = float(input('合成比率(0<k<1)-> '))
 
 print('generate '+str(num)+' tetrahedron.')
 
+
+# 四面体リストの初期化処理
+tetras = []
+edges = []
+
+# 最初の四面体を作成
+tetra = Tetra([10, 10, 10], [-10, -10, 10], [10, -10, -10], [-10, 10, -10], 0)
+
+# 配列に追加
+tetras.append(tetra)
+
+target = random.randint(0, 3)
+
+triangle = tetra.triangle[target]
+left_point = tetra.point[target]
+
+# 2つ目の四面体生成
+# ベクトルを作る
+center = (np.array(triangle[0])+np.array(triangle[1]) +
+          np.array(triangle[2])) / 3  # 三角形の重心
+vector = np.array(left_point - center)  # 頂点-重心
+
+# 頂点を作る
+c = random.uniform(0.7, 1.5)  # ベクトルに掛け合わされる定数
+# candidate_point. 頂点候補（衝突判定によって棄却される可能性あり）
+point = -1 * c * vector + center
+
+second_tetra = Tetra(triangle[0], triangle[1], triangle[2], point, 1)
+
+tetras.append(second_tetra)
+
+tetras[1].isCreated[3] = 1  # 生成した時点で接してる四面体
+tetras[1].setChildVertex(3, tetras[0].point[target])
+tetras[0].isCreated[target] = 1
+tetras[0].setChildVertex(target, tetras[1].point[3])
+
+edges.append((0, 1))
+
+# 初期化処理終了
+
+# 状態番号を保有する配列の生成
 theta_list = [1, 2, 3, 4, 5, 6, 7, 8]
 random.shuffle(theta_list)
 phi_list = [1, 2, 3, 4]
@@ -110,27 +157,22 @@ random.shuffle(phi_list)
 
 random_list = {"theta": theta_list, "phi": phi_list}
 
-# 最初の四面体を作成
-tetra = Tetra([10, 10, 10], [-10, -10, 10], [10, -10, -10], [-10, 10, -10], 0)
-
-tetras = []
-
-# 配列に追加
-tetras.append(tetra)
-
 while len(tetras) < num:
     for i in range(len(tetras)):
         # i 番目の四面体情報を取得
         tetra_i = tetras[i]
 
         # i 番目の四面体情報をもとに新しい四面体を作成
+        # 原点を起点としたoutputの位置ベクトル.
+        c_p = gver.GenerateVertex(tetra_i, tetras, k, random_list)
         # 面を選ぶ
-        target = star.SelectTarget()
+        target = star.SelectTarget(c_p, tetra_i)
 
-        if tetra_i.isCreated[target] == 0:
+        if target != -1 and tetra_i.isCreated[target] == 0:
             s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
-            c_p = gver.GenerateVertex(tetra_i, tetras, target, k, random_list)
-
+            c_p += (np.array(s[0])+np.array(s[1]) +
+                    np.array(s[2])) / 3  # 注目する三角形の重心分のオフセットをかける
+            c_p = list(c_p)  # list型に変換
             # マージ処理を実施する前の四面体.
             candidate_tetra = Tetra(s[0], s[1], s[2], c_p, len(tetras))
             # マージ処理によってcandidate_tetraと結合した四面体.
@@ -158,7 +200,7 @@ while len(tetras) < num:
                     shared_edge = list(map(list, Set2D.set2D(
                         candidate_tetra.point) & Set2D.set2D(target_tetra.point)))
 
-                    ## 発生率はかなり低いが, 稀にcandidate_pointがshared_edgeに含まれる
+                    # 発生率はかなり低いが, 稀にcandidate_pointがshared_edgeに含まれる
                     # =新規で作成された頂点が既存の他の頂点にたまたま一致することがある.
                     # この場合は何もしないので、 それをハンドリング.
                     if not candidate_point in shared_edge:
@@ -239,10 +281,6 @@ obj = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
 for i, f in enumerate(faces):
     for j in range(3):
         obj.vectors[i][j] = vertices[f[j], :]
-
-
-# Y軸方向に90度回転
-#obj.rotate([0.0, 1.0, 0.0], math.radians(90))
 
 # 保存
 now = datetime.datetime.now()
