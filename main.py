@@ -65,9 +65,9 @@ edges.append((0, 1))
 # 初期化処理終了
 
 # 状態番号を保有する配列の生成
-theta_list = [1, 2, 3, 4, 5, 6, 7, 8]
+theta_list = list(range(1, 9))
 random.shuffle(theta_list)
-phi_list = [1, 2, 3, 4]
+phi_list = list(range(1, 9))
 random.shuffle(phi_list)
 
 random_list = {"theta": theta_list, "phi": phi_list}
