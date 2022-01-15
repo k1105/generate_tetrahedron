@@ -7,7 +7,7 @@ def SelectTarget(c_p, tetra):
     # 引数: なし
     # 戻り値: 0~3の整数
 
-    vector = [tetra.centroid, c_p+tetra.centroid]
+    vector = [tetra.centroid, tetra.centroid-c_p]
 
     target = -1
 
