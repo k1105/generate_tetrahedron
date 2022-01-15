@@ -64,6 +64,11 @@ edges.append((0, 1))
 
 # 初期化処理終了
 
+# 位置情報ベクトルを計算するための前処理
+# 頂部の計算
+vert = np.array([random.uniform(-100, 100),
+                 random.uniform(-100, 100), random.uniform(-100, 100)])
+
 # 状態番号を保有する配列の生成
 theta_list = list(range(1, 9))
 random.shuffle(theta_list)
@@ -79,7 +84,7 @@ while len(tetras) < num:
 
         # i 番目の四面体情報をもとに新しい四面体を作成
         # 原点を起点としたoutputの位置ベクトル.
-        c_p = gver.GenerateVertex(tetra_i, tetras, k, random_list)
+        c_p = gver.GenerateVertex(tetra_i, tetras, k, vert, random_list)
         # 面を選ぶ
         target = star.SelectTarget(c_p, tetra_i)
 

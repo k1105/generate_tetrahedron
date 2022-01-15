@@ -54,9 +54,7 @@ class Tetra():
 
         return np.array(sum)
 
-    def getPositionInformationVector(self, tetras):
-        vert = np.array([random.uniform(-100, 100),
-                        random.uniform(-100, 100), random.uniform(-100, 100)])
+    def getPositionInformationVector(self, vert, tetras):
         d = LP.norm(self.centroid - vert)
         if d == 0:  # NOTE: d == 0の場合のハンドリングについては要検討. 現在暫定的に３次の0ベクトルを返している.
             return np.array([0, 0, 0])
