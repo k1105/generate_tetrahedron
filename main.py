@@ -22,7 +22,10 @@ threshold = int(input('くっつける頂点の距離の閾値-> '))  # 2つの�
 k = float(input('合成比率(0<k<1)-> '))
 
 print('generate '+str(num)+' tetrahedron.')
-random.seed(datetime.datetime.now())  # random seedを現在時刻に指定
+
+# random seedを現在時刻に指定
+# pythonの場合, random seedは明示せずとも実行のたびに異なるseedを設定してくれるが, そのseedがいくつに設定されているのか, またどのタイミングで値が切り替わるのか把握できないので, 実行のたびに確実にseedが更新されるようマニュアルで指定している.
+random.seed(datetime.datetime.now())
 
 # 四面体リストの初期化処理
 tetras = []
@@ -130,22 +133,23 @@ while len(tetras) < num:
                 # 発生率はかなり低いが, 稀にcandidate_pointがshared_edgeに含まれる
                 # =新規で作成された頂点が既存の他の頂点にたまたま一致することがある.
                 # この場合は何もしないので、 それをハンドリング.
-                if not candidate_point in shared_edge:
+                if candidate_point in shared_edge:
+                    continue
 
-                    for target_point in target_points:
-                        # print("target")
-                        target_triangle_index = target_tetra.findTriangleIndex(
-                            shared_edge[0], shared_edge[1], target_point)
-                        # merge先になる可能性のある四面体におけるisCreatedのチェック.
-                        if target_tetra.isCreated[target_triangle_index] == 0 and not tint.isIntersectToTriangle(candidate_tetra.triangle[3], [candidate_point, target_point]):
-                            # 閾値以下、かつマージ後の頂点が四面体の裏側に回ってないか判定.
-                            if LP.norm(np.array(target_point)-np.array(candidate_point)) < threshold:
-                                candidate_triangle_index = candidate_tetra.findTriangleIndex(
-                                    shared_edge[0], shared_edge[1], candidate_point)
-                                candidate_tetra.point[3] = target_point
-                                connected_tetra = target_tetra
-                                merged = True
-                                break
+                for target_point in target_points:
+                    # print("target")
+                    target_triangle_index = target_tetra.findTriangleIndex(
+                        shared_edge[0], shared_edge[1], target_point)
+                    # merge先になる可能性のある四面体におけるisCreatedのチェック.
+                    if target_tetra.isCreated[target_triangle_index] == 0 and not tint.isIntersectToTriangle(candidate_tetra.triangle[3], [candidate_point, target_point]):
+                        # 閾値以下、かつマージ後の頂点が四面体の裏側に回ってないか判定.
+                        if LP.norm(np.array(target_point)-np.array(candidate_point)) < threshold:
+                            candidate_triangle_index = candidate_tetra.findTriangleIndex(
+                                shared_edge[0], shared_edge[1], candidate_point)
+                            candidate_tetra.point[3] = target_point
+                            connected_tetra = target_tetra
+                            merged = True
+                            break
 
         # merge処理 終了
 
@@ -228,4 +232,6 @@ for tetra in tetras:
 
 for i, j in edges:
     G.edge(str(i), str(j))
+
+print('completed.')
 G.render(dir_path+'/'+now.strftime('%Y%m%d_%H%M%S'))
