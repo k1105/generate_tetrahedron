@@ -20,14 +20,14 @@ def SelectTarget(c_p, tetra):
         # どの平面とも交差せず, またベクトルの大きさが0でなかった場合
         print('error!')
         print("triangles: \n"
-              + str(list(map(lambda val: '{:.2f}'.format(val),
-                    tetra.triangle[0]))) + "\n"
-              + str(list(map(lambda val: '{:.2f}'.format(val),
-                    tetra.triangle[1]))) + "\n"
-              + str(list(map(lambda val: '{:.2f}'.format(val),
-                    tetra.triangle[2]))) + "\n"
-              + str(list(map(lambda val: '{:.2f}'.format(val),
-                    tetra.triangle[3])))
+              + list(map(lambda val: '{:.2f}'.format(val),
+                         tetra.triangle[0])) + "\n"
+              + list(map(lambda val: '{:.2f}'.format(val),
+                         tetra.triangle[1])) + "\n"
+              + list(map(lambda val: '{:.2f}'.format(val),
+                         tetra.triangle[2])) + "\n"
+              + list(map(lambda val: '{:.2f}'.format(val),
+                         tetra.triangle[3]))
               )
         print("line: \n"
               + str(vector))
