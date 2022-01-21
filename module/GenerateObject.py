@@ -6,6 +6,7 @@ from module import SelectTarget as star
 from module import GenerateOutuptVector as gout
 from module import TetraClass as tc
 from module import MergeTetra as mt
+from module import InitializeGeneArray as iga
 
 
 def GenerateObject(num, threshold, k, vert, gene_array):
@@ -48,12 +49,23 @@ def GenerateObject(num, threshold, k, vert, gene_array):
 
     # 初期化処理終了
 
+    # 各ループで生成される四面体の総数を記録
+    last_tetra_num = 1
+
     while len(tetras) < num:
+        if last_tetra_num == 0:  # 前回のイテレーションで新規に要素が生成されなかった場合
+            gene_array = iga.InitializeGeneArray()
+            print('\n failed to generate object. redo:')
+            return GenerateObject(num, threshold, k, vert, gene_array)
+
+        last_tetra_num = 0
+
         for tetra in tetras:
             # i 番目の四面体情報を取得
             # i 番目の四面体情報をもとに新しい四面体を作成
             # 原点を起点としたoutputの位置ベクトル.
-            out = gout.GenerateOutputVector(tetra, tetras, k, vert, gene_array)
+            out = gout.GenerateOutputVector(
+                tetra, tetras, k, vert, gene_array)
             # 面を選ぶ
             target = star.SelectTarget(out, tetra)
 
@@ -108,11 +120,10 @@ def GenerateObject(num, threshold, k, vert, gene_array):
 
                 # 一覧に追加
                 tetras.append(validated_tetra)
+                last_tetra_num += 1
 
                 print("\r"+"processing...(" +
                       '{:.1f}'.format(len(tetras)/num*100)+"%)", end="")
 
-            if(len(tetras) == num):
-                break
-
-    return tetras, edges
+            if(len(tetras) >= num):
+                return tetras, edges

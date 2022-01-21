@@ -18,16 +18,12 @@ def SelectTarget(c_p, tetra):
 
     if target == -1 and LP.norm(c_p) != 0:
         # どの平面とも交差せず, またベクトルの大きさが0でなかった場合
-        print('error!')
+        print('\n error!')
         print("triangles: \n"
-              + list(map(lambda val: '{:.2f}'.format(val),
-                         tetra.triangle[0])) + "\n"
-              + list(map(lambda val: '{:.2f}'.format(val),
-                         tetra.triangle[1])) + "\n"
-              + list(map(lambda val: '{:.2f}'.format(val),
-                         tetra.triangle[2])) + "\n"
-              + list(map(lambda val: '{:.2f}'.format(val),
-                         tetra.triangle[3]))
+              + str(tetra.triangle[0]) + "\n"
+              + str(tetra.triangle[1]) + "\n"
+              + str(tetra.triangle[2]) + "\n"
+              + str(tetra.triangle[3])
               )
         print("line: \n"
               + str(vector))
