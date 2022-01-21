@@ -79,25 +79,23 @@ random.shuffle(phi_list)
 random_list = {"theta": theta_list, "phi": phi_list}
 
 while len(tetras) < num:
-    for i in range(len(tetras)):
+    for tetra in tetras:
         # i 番目の四面体情報を取得
-        tetra_i = tetras[i]
-
         # i 番目の四面体情報をもとに新しい四面体を作成
         # 原点を起点としたoutputの位置ベクトル.
-        c_p = gver.GenerateVertex(tetra_i, tetras, k, vert, random_list)
+        c_p = gver.GenerateVertex(tetra, tetras, k, vert, random_list)
         # 面を選ぶ
-        target = star.SelectTarget(c_p, tetra_i)
+        target = star.SelectTarget(c_p, tetra)
 
         if target == -1:
-            ## print('output vector == 0: '+str(tetra_i.index))
+            ## print('output vector == 0: '+str(tetra.index))
             continue
 
-        if tetra_i.isCreated[target] != 0:
-            ## print('selected plane already has an element.: '+str(tetra_i.index))
+        if tetra.isCreated[target] != 0:
+            ## print('selected plane already has an element.: '+str(tetra.index))
             continue
 
-        s = tetra_i.triangle[target]  # tetra_i上のtarget番目の三角形.
+        s = tetra.triangle[target]  # tetra上のtarget番目の三角形.
         c_p += (np.array(s[0])+np.array(s[1]) +
                 np.array(s[2])) / 3  # 注目する三角形の重心分のオフセットをかける
         c_p = list(c_p)  # list型に変換
@@ -156,11 +154,11 @@ while len(tetras) < num:
         if not tcol.isCollide(candidate_tetra, tetras):
             # 判定をPassした場合 :
             candidate_tetra.isCreated[3] = 1  # 生成した時点で接してる四面体
-            candidate_tetra.setChildVertex(3, tetras[i].point[target])
-            tetras[i].isCreated[target] = 1
-            tetras[i].setChildVertex(target, candidate_tetra.point[3])
+            candidate_tetra.setChildVertex(3, tetra.point[target])
+            tetra.isCreated[target] = 1
+            tetra.setChildVertex(target, candidate_tetra.point[3])
 
-            edges.append((tetra_i.index, candidate_tetra.index))
+            edges.append((tetra.index, candidate_tetra.index))
 
             if connected_tetra is not None:
                 if candidate_triangle_index != -1 and target_triangle_index != -1:
