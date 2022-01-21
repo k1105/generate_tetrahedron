@@ -7,7 +7,7 @@ from module import TetraCollisionDetection as tcol
 from module import TriangleIntersectionDetection as tint
 from module import Set2D
 from module import SelectTarget as star
-from module import GenerateVertex as gver
+from module import GenerateOutuptVector as gout
 from module import TetraClass as tc
 from module import Export as export
 from module import MergeTetra as mt
@@ -84,7 +84,7 @@ while len(tetras) < num:
         # i 番目の四面体情報を取得
         # i 番目の四面体情報をもとに新しい四面体を作成
         # 原点を起点としたoutputの位置ベクトル.
-        out = gver.GenerateVertex(tetra, tetras, k, vert, random_list)
+        out = gout.GenerateOutputVector(tetra, tetras, k, vert, random_list)
         # 面を選ぶ
         target = star.SelectTarget(out, tetra)
 
