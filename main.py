@@ -4,6 +4,7 @@ import time
 import datetime
 from module import Export as export
 from module import GenerateObject as gobj
+from module import InitializeGeneArray as iga
 
 ####### MAIN #######
 start = time.time()
@@ -24,18 +25,14 @@ vert = np.array([random.uniform(-100, 100),
                  random.uniform(-100, 100), random.uniform(-100, 100)])
 
 # 状態番号を保有する配列の生成
-weight_list = [random.uniform(0.8, 1.2) for i in range(32)]
-theta_list = [random.randint(1, 8) for i in range(32)]
-phi_list = [random.randint(1, 8) for i in range(32)]
 
-gene_array = {"weight": weight_list, "theta": theta_list, "phi": phi_list}
+gene_array = iga.InitializeGeneArray()
 
-# 形状生成処理　開始
+# 形状生成
 tetras, edges = gobj.GenerateObject(num, threshold, k, vert, gene_array)
-
-# 形状生成処理　終了
 
 elapsed_time = time.time() - start
 print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
 
+# 書き出し処理
 export.Export(tetras, edges)
