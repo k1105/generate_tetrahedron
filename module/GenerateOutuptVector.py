@@ -3,7 +3,7 @@ import math
 import numpy.linalg as LP
 
 
-def GenerateVertex(tetra, tetras, k, vert, gene):
+def GenerateOutputVector(tetra, tetras, k, vert, gene):
 
     pi = math.pi
 
