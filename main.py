@@ -14,6 +14,11 @@ threshold = int(input('くっつける頂点の距離の閾値-> '))  # 2つの�
 k = float(input('合成比率(0<k<1)-> '))
 d_max = float(input('d_max(>=0) -> '))
 
+vert = [0, 0, 0]
+vert[0] = float(input('頂部のx座標 -> '))
+vert[1] = float(input('頂部のy座標 -> '))
+vert[2] = float(input('頂部のz座標 -> '))
+
 print('generate '+str(num)+' tetrahedron.')
 
 # random seedを現在時刻に指定
@@ -22,8 +27,6 @@ random.seed(datetime.datetime.now())
 
 # 遺伝情報
 # 頂部の計算
-vert = np.array([random.uniform(-100, 100),
-                 random.uniform(-100, 100), random.uniform(-100, 100)])
 
 # 状態番号を保有する配列の生成
 
