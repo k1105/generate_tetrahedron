@@ -3,7 +3,7 @@ import math
 import numpy.linalg as LP
 
 
-def GenerateVertex(tetra, tetras, k, vert, random_list):
+def GenerateVertex(tetra, tetras, k, vert, gene):
 
     pi = math.pi
 
@@ -29,15 +29,16 @@ def GenerateVertex(tetra, tetras, k, vert, random_list):
     else:
         print("phi error!")
 
-    if 1 <= theta_num <= 8:
-        out_theta = theta + random_list["theta"][theta_num-1] * pi / 4
-    else:
+    if not 1 <= theta_num <= 8:
         print("theta_num error!")
 
-    if 1 <= phi_num <= 4:
-        out_phi = phi + random_list["phi"][phi_num-1] * pi / 8
-    else:
+    if not 1 <= phi_num <= 4:
         print("phi_num error!")
+
+    state = theta_num + 8 * (phi_num - 1)  # 1 < state < 32
+
+    out_theta = theta + gene["theta"][state-1] * pi / 4
+    out_phi = phi + gene["phi"][state-1] * pi / 8
 
     output = input_norm * np.array([math.cos(out_phi)*math.cos(out_theta),
                                     math.cos(out_phi)*math.sin(out_theta), math.sin(out_phi)])
