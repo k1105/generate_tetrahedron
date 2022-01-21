@@ -1,11 +1,12 @@
 import numpy as np
 import os
 import datetime
+import csv
 from stl import mesh
 from graphviz import Digraph
 
 
-def Export(tetras, edges):
+def Export(tetras, edges, num, threshold, k, d_max, vert):
     vertices = []
     faces = []
 
@@ -49,5 +50,13 @@ def Export(tetras, edges):
     for i, j in edges:
         G.edge(str(i), str(j))
 
-    print('completed.')
     G.render(dir_path+'/'+now.strftime('%Y%m%d_%H%M%S'))
+
+    with open(dir_path+'/params.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(["生成要素の下限", "結合の閾値", "合成比率", "d_max"])
+        writer.writerow([num, threshold, k, d_max])
+        writer.writerow(['頂部のx座標', '頂部のy座標', '頂部のz座標'])
+        writer.writerow(vert)
+
+    print('completed.')
