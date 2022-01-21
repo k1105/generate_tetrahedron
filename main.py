@@ -112,29 +112,27 @@ while len(tetras) < num:
 
         if not tcol.isCollide(processed_tetra, tetras):
             # 判定をPassした場合 :
-            processed_tetra.isCreated[3] = 1  # 生成した時点で接してる四面体
-            processed_tetra.setChildVertex(3, tetra.point[target])
+            validated_tetra = processed_tetra
+            validated_tetra.isCreated[3] = 1  # 生成した時点で接してる四面体
+            validated_tetra.setChildVertex(3, tetra.point[target])
             tetra.isCreated[target] = 1
-            tetra.setChildVertex(target, processed_tetra.point[3])
+            tetra.setChildVertex(target, validated_tetra.point[3])
 
-            edges.append((tetra.index, processed_tetra.index))
+            edges.append((tetra.index, validated_tetra.index))
 
             if connected_tetra is not None:
                 if candidate_triangle_index != -1 and target_triangle_index != -1:
-                    processed_tetra.isCreated[candidate_triangle_index] = 1
-                    processed_tetra.setChildVertex(
+                    validated_tetra.isCreated[candidate_triangle_index] = 1
+                    validated_tetra.setChildVertex(
                         candidate_triangle_index, tetras[connected_tetra.index].point[target_triangle_index])
                     tetras[connected_tetra.index].isCreated[target_triangle_index] = 1
                     tetras[connected_tetra.index].setChildVertex(
-                        target_triangle_index, processed_tetra.point[candidate_triangle_index])
+                        target_triangle_index, validated_tetra.point[candidate_triangle_index])
                     edges.append(
-                        (connected_tetra.index, processed_tetra.index))
+                        (connected_tetra.index, validated_tetra.index))
 
             # 一覧に追加
-            new_tetra = tc.Tetra(processed_tetra.point[0], processed_tetra.point[1],
-                                 processed_tetra.point[2], processed_tetra.point[3], processed_tetra.index)
-            new_tetra.isCreated = processed_tetra.isCreated
-            tetras.append(new_tetra)
+            tetras.append(validated_tetra)
 
             print("\r"+"processing...(" +
                   '{:.1f}'.format(len(tetras)/num*100)+"%)", end="")
