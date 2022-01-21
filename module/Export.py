@@ -66,4 +66,15 @@ def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final):
             writer.writerow([i+1, gene_final["weight"][i],
                             gene_final["theta"][i], gene_final["phi"][i]])
 
+    with open(dir_path+'/object_information.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(["index", "pos0.x", "pos0.y",
+                         "pos0.z", "pos1.x", "pos1.y", "pos1.z", "pos2.x", "pos2.y", "pos2.z", "pos03.x", "pos3.y", "pos3.z", "centroid.x", "centroid.y", "centroid.z", "isCreated"])
+        for tetra in tetras:
+            data = [tetra.index]+tetra.point[0]+tetra.point[1]+tetra.point[2]+tetra.point[3] + \
+                list(tetra.centroid) + \
+                [int(tetra.isCreated[0]+tetra.isCreated[1] +
+                     tetra.isCreated[2]+tetra.isCreated[3])]
+            writer.writerow(data)
+
     print('completed.')
