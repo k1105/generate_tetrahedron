@@ -34,11 +34,12 @@ gene_array = iga.InitializeGeneArray()
 
 # 形状生成
 # gene_final: 最終的な形状を生成した際に使用された遺伝配列.
-tetras, edges, gene_final = gobj.GenerateObject(
-    num, threshold, k, vert, d_max, gene_array)
+tetras, edges, gene_final, attempt = gobj.GenerateObject(
+    num, threshold, k, vert, d_max, gene_array, 0)
 
 elapsed_time = time.time() - start
 print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
 
 # 書き出し処理
-export.Export(tetras, edges, num, threshold, k, d_max, vert, gene_final)
+export.Export(tetras, edges, num, threshold, k, d_max, vert,
+              gene_final, "{: .4g}".format(elapsed_time), attempt)

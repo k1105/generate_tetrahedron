@@ -6,7 +6,7 @@ from stl import mesh
 from graphviz import Digraph
 
 
-def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final):
+def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final, time, attempt):
     vertices = []
     faces = []
 
@@ -65,5 +65,26 @@ def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final):
         for i in range(32):
             writer.writerow([i+1, gene_final["weight"][i],
                             gene_final["theta"][i], gene_final["phi"][i]])
+
+    with open(dir_path+'/object_information.csv', 'w') as f:
+        writer = csv.writer(f)
+        sum = [0, 0, 0, 0, 0]
+        for tetra in tetras:
+            isCreated = int(tetra.isCreated[0]+tetra.isCreated[1] +
+                            tetra.isCreated[2]+tetra.isCreated[3])
+            sum[isCreated] += 1
+
+        writer.writerow(["実行時間", "総試行回数", "isCreated==0の要素数",
+                        "isCreated==1の要素数", "isCreated==2の要素数", "isCreated==3の要素数", "isCreated==4の要素数"])
+        writer.writerow(
+            [time, attempt, sum[0], sum[1], sum[2], sum[3], sum[4]])
+        writer.writerow(["index", "pos0.x", "pos0.y",
+                         "pos0.z", "pos1.x", "pos1.y", "pos1.z", "pos2.x", "pos2.y", "pos2.z", "pos03.x", "pos3.y", "pos3.z", "centroid.x", "centroid.y", "centroid.z", "isCreated"])
+        for tetra in tetras:
+            data = [tetra.index]+tetra.point[0]+tetra.point[1]+tetra.point[2]+tetra.point[3] + \
+                list(tetra.centroid) + \
+                [int(tetra.isCreated[0]+tetra.isCreated[1] +
+                     tetra.isCreated[2]+tetra.isCreated[3])]
+            writer.writerow(data)
 
     print('completed.')

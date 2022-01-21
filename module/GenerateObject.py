@@ -9,7 +9,7 @@ from module import MergeTetra as mt
 from module import InitializeGeneArray as iga
 
 
-def GenerateObject(num, threshold, k, vert, d_max, gene_array):
+def GenerateObject(num, threshold, k, vert, d_max, gene_array, attempt):
     tetras = []
     edges = []
 
@@ -97,8 +97,8 @@ def GenerateObject(num, threshold, k, vert, d_max, gene_array):
                       '{:.1f}'.format(len(tetras))+")", end="")
 
     if(len(tetras) >= num):
-        return tetras, edges, gene_array
+        return tetras, edges, gene_array, attempt
     else:
-        print('\n failed to generate object. redo:')
+        print('\n failed to generate object. redo:('+str(attempt)+')')
         gene_array = iga.InitializeGeneArray()
-        return GenerateObject(num, threshold, k, vert, d_max, gene_array)
+        return GenerateObject(num, threshold, k, vert, d_max, gene_array, attempt+1)
