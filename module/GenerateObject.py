@@ -52,12 +52,7 @@ def GenerateObject(num, threshold, k, vert, gene_array):
     # 各ループで生成される四面体の総数を記録
     last_tetra_num = 1
 
-    while len(tetras) < num:
-        if last_tetra_num == 0:  # 前回のイテレーションで新規に要素が生成されなかった場合
-            gene_array = iga.InitializeGeneArray()
-            print('\n failed to generate object. redo:')
-            return GenerateObject(num, threshold, k, vert, gene_array)
-
+    while last_tetra_num != 0:
         last_tetra_num = 0
 
         for tetra in tetras:
@@ -122,8 +117,12 @@ def GenerateObject(num, threshold, k, vert, gene_array):
                 tetras.append(validated_tetra)
                 last_tetra_num += 1
 
-                print("\r"+"processing...(" +
-                      '{:.1f}'.format(len(tetras)/num*100)+"%)", end="")
+                print("\r"+"processing...( number of tetras: " +
+                      '{:.1f}'.format(len(tetras))+")", end="")
 
-            if(len(tetras) >= num):
-                return tetras, edges
+    if(len(tetras) >= num):
+        return tetras, edges
+    else:
+        print('\n failed to generate object. redo:')
+        gene_array = iga.InitializeGeneArray()
+        return GenerateObject(num, threshold, k, vert, gene_array)

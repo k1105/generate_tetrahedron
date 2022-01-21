@@ -9,7 +9,7 @@ from module import InitializeGeneArray as iga
 ####### MAIN #######
 start = time.time()
 # 生成したい四面体の個数をここで指定:
-num = int(input('生成する四面体の個数(>2) -> '))
+num = int(input('生成する四面体の個数の下限 -> '))
 threshold = int(input('くっつける頂点の距離の閾値-> '))  # 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
 k = float(input('合成比率(0<k<1)-> '))
 
