@@ -3,13 +3,13 @@ import math
 import numpy.linalg as LP
 
 
-def GenerateVertex(tetra, tetras, k, random_list):
+def GenerateVertex(tetra, tetras, k, vert, random_list):
 
     pi = math.pi
 
     input = k * tetra.getNeighborInformationVector()+(1 - k) * \
         tetra.getPositionInformationVector(
-            tetras)  # 入力ベクトル. 注目要素の近傍情報ベクトルと位置情報ベクトルのそれぞれにk, 1-k倍をして算出.
+            vert, tetras)  # 入力ベクトル. 注目要素の近傍情報ベクトルと位置情報ベクトルのそれぞれにk, 1-k倍をして算出.
 
     input_norm = LP.norm(input)
 
