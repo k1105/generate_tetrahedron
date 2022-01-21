@@ -1,15 +1,22 @@
 import random
-import numpy as np
 import time
+import argparse
 import datetime
 from module import Export as export
 from module import GenerateObject as gobj
 from module import InitializeGeneArray as iga
+from module import InitializeGeneArrayViaCSV as igacsv
 
 ####### MAIN #######
 start = time.time()
-# 生成したい四面体の個数をここで指定:
-num = int(input('生成する四面体の個数の下限 -> '))
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--file", type=str)
+
+if parser.parse_args().file:
+    num = 0
+else:
+    num = int(input('生成する四面体の個数の下限 -> '))
 threshold = int(input('くっつける頂点の距離の閾値-> '))  # 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
 k = float(input('合成比率(0<k<1)-> '))
 d_max = float(input('d_max(>=0) -> '))
@@ -20,17 +27,14 @@ vert[1] = float(input('頂部のy座標 -> '))
 vert[2] = float(input('頂部のz座標 -> '))
 
 print('generate '+str(num)+' tetrahedron.')
-
-# random seedを現在時刻に指定
-# pythonの場合, random seedは明示せずとも実行のたびに異なるseedを設定してくれるが, そのseedがいくつに設定されているのか, またどのタイミングで値が切り替わるのか把握できないので, 実行のたびに確実にseedが更新されるようマニュアルで指定している.
+print(parser.parse_args().file)
+if parser.parse_args().file:
+    gene_array = igacsv.InitializeGeneArrayViaCSV(parser.parse_args().file)
+else:
+    gene_array = iga.InitializeGeneArray()
+    # random seedを現在時刻に指定
+    # pythonの場合, random seedは明示せずとも実行のたびに異なるseedを設定してくれるが, そのseedがいくつに設定されているのか, またどのタイミングで値が切り替わるのか把握できないので, 実行のたびに確実にseedが更新されるようマニュアルで指定している.
 random.seed(datetime.datetime.now())
-
-# 遺伝情報
-# 頂部の計算
-
-# 状態番号を保有する配列の生成
-
-gene_array = iga.InitializeGeneArray()
 
 # 形状生成
 # gene_final: 最終的な形状を生成した際に使用された遺伝配列.

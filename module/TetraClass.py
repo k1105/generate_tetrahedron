@@ -57,7 +57,7 @@ class Tetra():
                 # -pi/2 <= phi < pi/2
                 phi = math.atan2(vec[2], abs(vec[1]))
                 state = gs.GetState(theta, phi)
-                sum += weight[state] * vec
+                sum += weight[state-1] * vec
 
         return np.array(sum)
 
