@@ -97,7 +97,7 @@ def GenerateObject(num, threshold, k, vert, d_max, gene_array):
                       '{:.1f}'.format(len(tetras))+")", end="")
 
     if(len(tetras) >= num):
-        return tetras, edges
+        return tetras, edges, gene_array
     else:
         print('\n failed to generate object. redo:')
         gene_array = iga.InitializeGeneArray()

@@ -33,10 +33,12 @@ random.seed(datetime.datetime.now())
 gene_array = iga.InitializeGeneArray()
 
 # 形状生成
-tetras, edges = gobj.GenerateObject(num, threshold, k, vert, d_max, gene_array)
+# gene_final: 最終的な形状を生成した際に使用された遺伝配列.
+tetras, edges, gene_final = gobj.GenerateObject(
+    num, threshold, k, vert, d_max, gene_array)
 
 elapsed_time = time.time() - start
 print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
 
 # 書き出し処理
-export.Export(tetras, edges, num, threshold, k, d_max, vert)
+export.Export(tetras, edges, num, threshold, k, d_max, vert, gene_final)
