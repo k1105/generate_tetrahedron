@@ -8,7 +8,7 @@ def GenerateOutputVector(tetra, k, vert, d_max, gene):
 
     pi = math.pi
 
-    input = k * tetra.getNeighborInformationVector()+(1 - k) * \
+    input = k * tetra.getNeighborInformationVector(gene["weight"])+(1 - k) * \
         tetra.getPositionInformationVector(
             vert, d_max)  # 入力ベクトル. 注目要素の近傍情報ベクトルと位置情報ベクトルのそれぞれにk, 1-k倍をして算出.
 
