@@ -1,6 +1,8 @@
 import numpy as np
 import numpy.linalg as LP
+import math
 from module import Set2D
+from module import GetState as gs
 
 
 class Tetra():
@@ -41,7 +43,8 @@ class Tetra():
         print("tetra's point: "+str(self.point))
         return -1
 
-    def getNeighborInformationVector(self):
+    def getNeighborInformationVector(self, weight):
+        pi = math.pi
         sum = [0, 0, 0]
         for i in range(4):
             if self.childVertex[i] != None:  # 生成されていた場合
@@ -49,7 +52,12 @@ class Tetra():
                 c = (np.array(s[0]) + np.array(s[1]) + np.array(s[2])) / 3
                 p = self.childVertex[i]
                 vec = p - c
-                sum += vec
+                # 0 <= theta < 2pi
+                theta = (math.atan2(vec[1], vec[0]) + 2 * pi) % (2 * pi)
+                # -pi/2 <= phi < pi/2
+                phi = math.atan2(vec[2], abs(vec[1]))
+                state = gs.GetState(theta, phi)
+                sum += weight[state] * vec
 
         return np.array(sum)
 
