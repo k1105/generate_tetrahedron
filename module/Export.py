@@ -6,7 +6,7 @@ from stl import mesh
 from graphviz import Digraph
 
 
-def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final):
+def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final, time):
     vertices = []
     faces = []
 
@@ -68,6 +68,8 @@ def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final):
 
     with open(dir_path+'/object_information.csv', 'w') as f:
         writer = csv.writer(f)
+        writer.writerow(["time"])
+        writer.writerow([time])
         writer.writerow(["index", "pos0.x", "pos0.y",
                          "pos0.z", "pos1.x", "pos1.y", "pos1.z", "pos2.x", "pos2.y", "pos2.z", "pos03.x", "pos3.y", "pos3.z", "centroid.x", "centroid.y", "centroid.z", "isCreated"])
         for tetra in tetras:

@@ -41,4 +41,5 @@ elapsed_time = time.time() - start
 print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
 
 # 書き出し処理
-export.Export(tetras, edges, num, threshold, k, d_max, vert, gene_final)
+export.Export(tetras, edges, num, threshold, k, d_max, vert,
+              gene_final, "{: .4g}".format(elapsed_time))
