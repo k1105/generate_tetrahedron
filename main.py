@@ -10,6 +10,7 @@ from module import SelectTarget as star
 from module import GenerateVertex as gver
 from module import TetraClass as tc
 from module import Export as export
+from module import MergeTetra as mt
 
 
 ####### MAIN #######
@@ -99,82 +100,40 @@ while len(tetras) < num:
         c_p += (np.array(s[0])+np.array(s[1]) +
                 np.array(s[2])) / 3  # 注目する三角形の重心分のオフセットをかける
         c_p = list(c_p)  # list型に変換
-        # マージ処理を実施する前の四面体.
+        # candidate_tetra : マージ処理を実施する前の四面体.
         candidate_tetra = tc.Tetra(s[0], s[1], s[2], c_p, len(tetras))
-        # マージ処理によってcandidate_tetraと結合した四面体.
-        connected_tetra = None
 
-        # merge処理 開始
-        merged = False
-
-        for target_tetra in tetras:
-            if merged:
-                break
-
-            # 共有する頂点の数を検出.
-            # 0 ... 四面体は接していない
-            # 1 ... 四面体は一点でのみ接する
-            # 2 ... 四面体は1辺を共有する
-            # 3 ... 四面体は1面を共有する
-            if len(Set2D.set2D(candidate_tetra.point) & Set2D.set2D(target_tetra.point)) == 2:  # 1つの辺を共有する場合
-                candidate_point = candidate_tetra.point[3]  # 末尾の頂点.
-                # くっつく可能性のある頂点 = 共有している辺以外の頂点２つ.　= 「candidate_tetraとtarget_tetraに共通しない要素」とtarget_tetraに共通する要素
-                target_points = list(map(list, (Set2D.set2D(candidate_tetra.point) ^ Set2D.set2D(
-                    target_tetra.point)) & Set2D.set2D(target_tetra.point)))
-
-                # 2つの四面体が共有する辺.
-                shared_edge = list(map(list, Set2D.set2D(
-                    candidate_tetra.point) & Set2D.set2D(target_tetra.point)))
-
-                # 発生率はかなり低いが, 稀にcandidate_pointがshared_edgeに含まれる
-                # =新規で作成された頂点が既存の他の頂点にたまたま一致することがある.
-                # この場合は何もしないので、 それをハンドリング.
-                if candidate_point in shared_edge:
-                    continue
-
-                for target_point in target_points:
-                    # print("target")
-                    target_triangle_index = target_tetra.findTriangleIndex(
-                        shared_edge[0], shared_edge[1], target_point)
-                    # merge先になる可能性のある四面体におけるisCreatedのチェック.
-                    if target_tetra.isCreated[target_triangle_index] == 0 and not tint.isIntersectToTriangle(candidate_tetra.triangle[3], [candidate_point, target_point]):
-                        # 閾値以下、かつマージ後の頂点が四面体の裏側に回ってないか判定.
-                        if LP.norm(np.array(target_point)-np.array(candidate_point)) < threshold:
-                            candidate_triangle_index = candidate_tetra.findTriangleIndex(
-                                shared_edge[0], shared_edge[1], candidate_point)
-                            candidate_tetra.point[3] = target_point
-                            connected_tetra = target_tetra
-                            merged = True
-                            break
-
-        # merge処理 終了
+        # merge処理
+        # connected_tetra : マージ処理によってcandidate_tetraと結合した四面体.
+        processed_tetra, connected_tetra, candidate_triangle_index, target_triangle_index = mt.Merge(
+            candidate_tetra, tetras, threshold)
 
         # print("\r"+"processing...("+'{:.1f}'.format(len(tetras)/num*100)+"%) | check collision of tetra (from: "+str(target_tetra.index)+")" ,end="")
 
-        if not tcol.isCollide(candidate_tetra, tetras):
+        if not tcol.isCollide(processed_tetra, tetras):
             # 判定をPassした場合 :
-            candidate_tetra.isCreated[3] = 1  # 生成した時点で接してる四面体
-            candidate_tetra.setChildVertex(3, tetra.point[target])
+            processed_tetra.isCreated[3] = 1  # 生成した時点で接してる四面体
+            processed_tetra.setChildVertex(3, tetra.point[target])
             tetra.isCreated[target] = 1
-            tetra.setChildVertex(target, candidate_tetra.point[3])
+            tetra.setChildVertex(target, processed_tetra.point[3])
 
-            edges.append((tetra.index, candidate_tetra.index))
+            edges.append((tetra.index, processed_tetra.index))
 
             if connected_tetra is not None:
                 if candidate_triangle_index != -1 and target_triangle_index != -1:
-                    candidate_tetra.isCreated[candidate_triangle_index] = 1
-                    candidate_tetra.setChildVertex(
+                    processed_tetra.isCreated[candidate_triangle_index] = 1
+                    processed_tetra.setChildVertex(
                         candidate_triangle_index, tetras[connected_tetra.index].point[target_triangle_index])
                     tetras[connected_tetra.index].isCreated[target_triangle_index] = 1
                     tetras[connected_tetra.index].setChildVertex(
-                        target_triangle_index, candidate_tetra.point[candidate_triangle_index])
+                        target_triangle_index, processed_tetra.point[candidate_triangle_index])
                     edges.append(
-                        (connected_tetra.index, candidate_tetra.index))
+                        (connected_tetra.index, processed_tetra.index))
 
             # 一覧に追加
-            new_tetra = tc.Tetra(candidate_tetra.point[0], candidate_tetra.point[1],
-                                 candidate_tetra.point[2], candidate_tetra.point[3], candidate_tetra.index)
-            new_tetra.isCreated = candidate_tetra.isCreated
+            new_tetra = tc.Tetra(processed_tetra.point[0], processed_tetra.point[1],
+                                 processed_tetra.point[2], processed_tetra.point[3], processed_tetra.index)
+            new_tetra.isCreated = processed_tetra.isCreated
             tetras.append(new_tetra)
 
             print("\r"+"processing...(" +
