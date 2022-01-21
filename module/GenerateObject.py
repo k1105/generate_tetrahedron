@@ -20,33 +20,6 @@ def GenerateObject(num, threshold, k, vert, d_max, gene_array):
     # 配列に追加
     tetras.append(tetra)
 
-    target = random.randint(0, 3)
-
-    triangle = tetra.triangle[target]
-    left_point = tetra.point[target]
-
-    # 2つ目の四面体生成
-    # ベクトルを作る
-    center = (np.array(triangle[0])+np.array(triangle[1]) +
-              np.array(triangle[2])) / 3  # 三角形の重心
-    vector = np.array(left_point - center)  # 頂点-重心
-
-    # 頂点を作る
-    c = random.uniform(0.7, 1.5)  # ベクトルに掛け合わされる定数
-    # candidate_point. 頂点候補（衝突判定によって棄却される可能性あり）
-    point = -1 * c * vector + center
-
-    second_tetra = tc.Tetra(triangle[0], triangle[1], triangle[2], point, 1)
-
-    tetras.append(second_tetra)
-
-    tetras[1].isCreated[3] = 1  # 生成した時点で接してる四面体
-    tetras[1].setChildVertex(3, tetras[0].point[target])
-    tetras[0].isCreated[target] = 1
-    tetras[0].setChildVertex(target, tetras[1].point[3])
-
-    edges.append((0, 1))
-
     # 初期化処理終了
 
     # 各ループで生成される四面体の総数を記録
