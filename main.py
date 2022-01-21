@@ -101,12 +101,12 @@ while len(tetras) < num:
                 np.array(s[2])) / 3  # 注目する三角形の重心分のオフセットをかける
         c_p = list(c_p)  # list型に変換
         # candidate_tetra : マージ処理を実施する前の四面体.
-        candidate_tetra = tc.Tetra(s[0], s[1], s[2], c_p, len(tetras))
+        raw_tetra = tc.Tetra(s[0], s[1], s[2], c_p, len(tetras))
 
         # merge処理
-        # connected_tetra : マージ処理によってcandidate_tetraと結合した四面体.
+        # connected_tetra : マージ処理によってraw_tetraと結合した四面体.
         processed_tetra, connected_tetra, candidate_triangle_index, target_triangle_index = mt.Merge(
-            candidate_tetra, tetras, threshold)
+            raw_tetra, tetras, threshold)
 
         # print("\r"+"processing...("+'{:.1f}'.format(len(tetras)/num*100)+"%) | check collision of tetra (from: "+str(target_tetra.index)+")" ,end="")
 
