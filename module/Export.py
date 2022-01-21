@@ -6,7 +6,7 @@ from stl import mesh
 from graphviz import Digraph
 
 
-def Export(tetras, edges, num, threshold, k, d_max, vert):
+def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final):
     vertices = []
     faces = []
 
@@ -58,5 +58,12 @@ def Export(tetras, edges, num, threshold, k, d_max, vert):
         writer.writerow([num, threshold, k, d_max])
         writer.writerow(['頂部のx座標', '頂部のy座標', '頂部のz座標'])
         writer.writerow(vert)
+
+    with open(dir_path+'/gene_array.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(["state", "weight", "theta", "phi"])
+        for i in range(32):
+            writer.writerow([i+1, gene_final["weight"][i],
+                            gene_final["theta"][i], gene_final["phi"][i]])
 
     print('completed.')
