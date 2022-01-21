@@ -100,18 +100,19 @@ while len(tetras) < num:
         # ベクトルを作る
         center = (np.array(s[0])+np.array(s[1]) +
                   np.array(s[2])) / 3  # 三角形の重心
-        vector = np.array(left_point - center)  # 頂点-重心
-        e = vector / LP.norm(vector)
+        left_point = tetra.point[target]
 
+        vector = np.array(left_point - center)  # 頂点-重心
+        e = vector / LP.norm(vector)  # 単位ベクトル
         # 頂点を作る
         point = -1 * (LP.norm(out)) * e + center
         # candidate_tetra : マージ処理を実施する前の四面体.
-        candidate_tetra = tc.Tetra(s[0], s[1], s[2], point, len(tetras))
+        raw_tetra = tc.Tetra(s[0], s[1], s[2], point, len(tetras))
 
         # merge処理
-        # connected_tetra : マージ処理によってcandidate_tetraと結合した四面体.
+        # connected_tetra : マージ処理によってraw_tetraと結合した四面体.
         processed_tetra, connected_tetra, candidate_triangle_index, target_triangle_index = mt.Merge(
-            candidate_tetra, tetras, threshold)
+            raw_tetra, tetras, threshold)
 
         # print("\r"+"processing...("+'{:.1f}'.format(len(tetras)/num*100)+"%) | check collision of tetra (from: "+str(target_tetra.index)+")" ,end="")
 
