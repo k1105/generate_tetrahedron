@@ -53,16 +53,11 @@ class Tetra():
 
         return np.array(sum)
 
-    def getPositionInformationVector(self, vert, tetras):
+    def getPositionInformationVector(self, vert, d_max):
         d = LP.norm(self.centroid - vert)
         if d == 0:  # NOTE: d == 0の場合のハンドリングについては要検討. 現在暫定的に３次の0ベクトルを返している.
             return np.array([0, 0, 0])
         e = (self.centroid - vert) / d
-        d_max = 0
-        for tetra in tetras:
-            d_cand = LP.norm(tetra.centroid - vert)
-            if d_max < d_cand:
-                d_max = d_cand
 
         return np.array((d_max - d) * e)
 
