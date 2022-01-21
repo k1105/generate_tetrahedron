@@ -3,13 +3,13 @@ import math
 import numpy.linalg as LP
 
 
-def GenerateOutputVector(tetra, tetras, k, vert, gene):
+def GenerateOutputVector(tetra, k, vert, d_max, gene):
 
     pi = math.pi
 
     input = k * tetra.getNeighborInformationVector()+(1 - k) * \
         tetra.getPositionInformationVector(
-            vert, tetras)  # 入力ベクトル. 注目要素の近傍情報ベクトルと位置情報ベクトルのそれぞれにk, 1-k倍をして算出.
+            vert, d_max)  # 入力ベクトル. 注目要素の近傍情報ベクトルと位置情報ベクトルのそれぞれにk, 1-k倍をして算出.
 
     input_norm = LP.norm(input)
 

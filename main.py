@@ -12,6 +12,12 @@ start = time.time()
 num = int(input('生成する四面体の個数の下限 -> '))
 threshold = int(input('くっつける頂点の距離の閾値-> '))  # 2つの頂点間の距離が, 閾値以下の場合に四面体同士がくっつく.
 k = float(input('合成比率(0<k<1)-> '))
+d_max = float(input('d_max(>=0) -> '))
+
+vert = [0, 0, 0]
+vert[0] = float(input('頂部のx座標 -> '))
+vert[1] = float(input('頂部のy座標 -> '))
+vert[2] = float(input('頂部のz座標 -> '))
 
 print('generate '+str(num)+' tetrahedron.')
 
@@ -21,15 +27,13 @@ random.seed(datetime.datetime.now())
 
 # 遺伝情報
 # 頂部の計算
-vert = np.array([random.uniform(-100, 100),
-                 random.uniform(-100, 100), random.uniform(-100, 100)])
 
 # 状態番号を保有する配列の生成
 
 gene_array = iga.InitializeGeneArray()
 
 # 形状生成
-tetras, edges = gobj.GenerateObject(num, threshold, k, vert, gene_array)
+tetras, edges = gobj.GenerateObject(num, threshold, k, vert, d_max, gene_array)
 
 elapsed_time = time.time() - start
 print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")

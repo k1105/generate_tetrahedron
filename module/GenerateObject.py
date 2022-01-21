@@ -9,7 +9,7 @@ from module import MergeTetra as mt
 from module import InitializeGeneArray as iga
 
 
-def GenerateObject(num, threshold, k, vert, gene_array):
+def GenerateObject(num, threshold, k, vert, d_max, gene_array):
     tetras = []
     edges = []
 
@@ -56,11 +56,14 @@ def GenerateObject(num, threshold, k, vert, gene_array):
         last_tetra_num = 0
 
         for tetra in tetras:
+            if LP.norm(tetra.centroid - vert) > d_max:
+                continue
+
             # i 番目の四面体情報を取得
             # i 番目の四面体情報をもとに新しい四面体を作成
             # 原点を起点としたoutputの位置ベクトル.
             out = gout.GenerateOutputVector(
-                tetra, tetras, k, vert, gene_array)
+                tetra, k, vert, d_max, gene_array)
             # 面を選ぶ
             target = star.SelectTarget(out, tetra)
 
@@ -125,4 +128,4 @@ def GenerateObject(num, threshold, k, vert, gene_array):
     else:
         print('\n failed to generate object. redo:')
         gene_array = iga.InitializeGeneArray()
-        return GenerateObject(num, threshold, k, vert, gene_array)
+        return GenerateObject(num, threshold, k, vert, d_max, gene_array)
