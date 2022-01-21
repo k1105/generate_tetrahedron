@@ -4,8 +4,6 @@ import numpy.linalg as LP
 import time
 import datetime
 from module import TetraCollisionDetection as tcol
-from module import TriangleIntersectionDetection as tint
-from module import Set2D
 from module import SelectTarget as star
 from module import GenerateOutuptVector as gout
 from module import TetraClass as tc
@@ -72,19 +70,18 @@ vert = np.array([random.uniform(-100, 100),
                  random.uniform(-100, 100), random.uniform(-100, 100)])
 
 # 状態番号を保有する配列の生成
-theta_list = list(range(1, 9))
-random.shuffle(theta_list)
-phi_list = list(range(1, 9))
-random.shuffle(phi_list)
+weight_list = [random.uniform(0.8, 1.2) for i in range(32)]
+theta_list = [random.randint(1, 8) for i in range(32)]
+phi_list = [random.randint(1, 8) for i in range(32)]
 
-random_list = {"theta": theta_list, "phi": phi_list}
+gene_array = {"weight": weight_list, "theta": theta_list, "phi": phi_list}
 
 while len(tetras) < num:
     for tetra in tetras:
         # i 番目の四面体情報を取得
         # i 番目の四面体情報をもとに新しい四面体を作成
         # 原点を起点としたoutputの位置ベクトル.
-        out = gout.GenerateOutputVector(tetra, tetras, k, vert, random_list)
+        out = gout.GenerateOutputVector(tetra, tetras, k, vert, gene_array)
         # 面を選ぶ
         target = star.SelectTarget(out, tetra)
 
