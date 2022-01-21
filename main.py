@@ -84,9 +84,9 @@ while len(tetras) < num:
         # i 番目の四面体情報を取得
         # i 番目の四面体情報をもとに新しい四面体を作成
         # 原点を起点としたoutputの位置ベクトル.
-        c_p = gver.GenerateVertex(tetra, tetras, k, vert, random_list)
+        out = gver.GenerateVertex(tetra, tetras, k, vert, random_list)
         # 面を選ぶ
-        target = star.SelectTarget(c_p, tetra)
+        target = star.SelectTarget(out, tetra)
 
         if target == -1:
             ## print('output vector == 0: '+str(tetra.index))
@@ -97,11 +97,17 @@ while len(tetras) < num:
             continue
 
         s = tetra.triangle[target]  # tetra上のtarget番目の三角形.
-        c_p += (np.array(s[0])+np.array(s[1]) +
-                np.array(s[2])) / 3  # 注目する三角形の重心分のオフセットをかける
-        c_p = list(c_p)  # list型に変換
+        # ベクトルを作る
+        center = (np.array(s[0])+np.array(s[1]) +
+                  np.array(s[2])) / 3  # 三角形の重心
+        left_point = tetra.point[target]
+
+        vector = np.array(left_point - center)  # 頂点-重心
+        e = vector / LP.norm(vector)  # 単位ベクトル
+        # 頂点を作る
+        point = -1 * (LP.norm(out)) * e + center
         # candidate_tetra : マージ処理を実施する前の四面体.
-        raw_tetra = tc.Tetra(s[0], s[1], s[2], c_p, len(tetras))
+        raw_tetra = tc.Tetra(s[0], s[1], s[2], point, len(tetras))
 
         # merge処理
         # connected_tetra : マージ処理によってraw_tetraと結合した四面体.
