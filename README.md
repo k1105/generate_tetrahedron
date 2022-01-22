@@ -63,14 +63,20 @@ $ python {filename}.py
 
 ## ファイル構成
 
-- main.py
-  = ランダムな四面体生成を行い, 生成された形状(stl 形式), processing で出力する用のコード(txt 形式: comming soon..)及び, 各四面体の関係をネットワーク図で表現したグラフ(png 形式)を出力する.
+### main.py
+遺伝情報に基づく四面体生成を行い, 生成された形状(stl 形式), 各四面体の関係をネットワーク図で表現したグラフ(png 形式)を出力する. また, csv形式で以下のファイルが生成される:
+- 最終的な形状生成に使用した遺伝配列 : gene_array.csv
+- 出力された形状における各四面体の情報 : object_information.csv
+- 形状生成に使用したパラメータ（最低要素数, 合成比率, マージ処理の閾値, d_max, 頂部の座標） : params.csv
   
 ![image](https://user-images.githubusercontent.com/47634358/143669189-2bb7d877-f817-4e0e-9b90-51475638ef2a.png)
 
-
-- module/Set2D.py
-  = 2 次元配列を集合に変換する関数.
-
-- module/TetraCollisionDetection.py
-  = 四面体の衝突判定に必要な関数を持つモジュール.
+main.pyの実行時, ``--file``オプションを指定すると, 遺伝配列についてcsvファイルから読み込ませることができる. 
+```
+python main.py --file <file_path>
+```
+例えば, 2022/1/22 3時46分50秒に実行した実行結果``out/20220122_034650``にある``gene_array.csv``を使用する場合は(もちろん, この名前の場所にファイルがあることが前提), 
+```
+python main.py --file out/20220122_034650/gene_array.csv
+```
+と実行.
