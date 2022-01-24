@@ -26,24 +26,29 @@ vert[0] = float(input('頂部のx座標 -> '))
 vert[1] = float(input('頂部のy座標 -> '))
 vert[2] = float(input('頂部のz座標 -> '))
 
-print('generate '+str(num)+' tetrahedron.')
-print(parser.parse_args().file)
 if parser.parse_args().file:
-    gene_array = igacsv.InitializeGeneArrayViaCSV(parser.parse_args().file)
+    times = 1
 else:
-    gene_array = iga.InitializeGeneArray()
-    # random seedを現在時刻に指定
-    # pythonの場合, random seedは明示せずとも実行のたびに異なるseedを設定してくれるが, そのseedがいくつに設定されているのか, またどのタイミングで値が切り替わるのか把握できないので, 実行のたびに確実にseedが更新されるようマニュアルで指定している.
-random.seed(datetime.datetime.now())
+    times = int(input('上記設定で形状生成を繰り返す回数(>=1) -> '))
 
-# 形状生成
-# gene_final: 最終的な形状を生成した際に使用された遺伝配列.
-tetras, edges, gene_final, attempt = gobj.GenerateObject(
-    num, threshold, k, vert, d_max, gene_array, 0)
+for i in range(times):
+    print('generate '+str(num)+' tetrahedron.')
+    if parser.parse_args().file:
+        gene_array = igacsv.InitializeGeneArrayViaCSV(parser.parse_args().file)
+    else:
+        gene_array = iga.InitializeGeneArray()
+        # random seedを現在時刻に指定
+        # pythonの場合, random seedは明示せずとも実行のたびに異なるseedを設定してくれるが, そのseedがいくつに設定されているのか, またどのタイミングで値が切り替わるのか把握できないので, 実行のたびに確実にseedが更新されるようマニュアルで指定している.
+    random.seed(datetime.datetime.now())
 
-elapsed_time = time.time() - start
-print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
+    # 形状生成
+    # gene_final: 最終的な形状を生成した際に使用された遺伝配列.
+    tetras, edges, gene_final, attempt = gobj.GenerateObject(
+        num, threshold, k, vert, d_max, gene_array, 0)
 
-# 書き出し処理
-export.Export(tetras, edges, num, threshold, k, d_max, vert,
-              gene_final, "{: .4g}".format(elapsed_time), attempt)
+    elapsed_time = time.time() - start
+    print("\n"+"completed. ({:.4g}".format(elapsed_time) + "s)")
+
+    # 書き出し処理
+    export.Export(tetras, edges, num, threshold, k, d_max, vert,
+                  gene_final, "{: .4g}".format(elapsed_time), attempt)
