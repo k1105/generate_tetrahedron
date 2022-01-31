@@ -80,6 +80,11 @@ def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final, time, atte
             [time, attempt, sum[0], sum[1], sum[2], sum[3], sum[4]])
         writer.writerow(["index", "pos0.x", "pos0.y",
                          "pos0.z", "pos1.x", "pos1.y", "pos1.z", "pos2.x", "pos2.y", "pos2.z", "pos03.x", "pos3.y", "pos3.z", "centroid.x", "centroid.y", "centroid.z", "isCreated", '体積'])
+
+        former = 0  # 分散の計算に用いる前の項 = 二乗の平均値
+        latter = 0  # 分散の計算に用いる後の項 = 平均値の二乗
+        sum = 0  # 体積の総和
+
         for tetra in tetras:
             # 体積の計算
             p0 = tetra.point[0]
@@ -91,10 +96,19 @@ def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final, time, atte
                           (p3[1]-p0[1])*((p1[2]-p0[2])*(p2[0]-p0[0])-(p1[0]-p0[0])*(p2[2]-p0[2])) +
                           (p3[2]-p0[2])*((p1[0]-p0[0])*(p2[1]-p0[1])-(p1[1]-p0[1])*(p2[0]-p0[0]))) / 6)
 
+            sum += volume
+            former += volume ** 2
+
             data = [tetra.index]+p0+p1+p2+p3 + \
                 list(tetra.centroid) + \
                 [int(tetra.isCreated[0]+tetra.isCreated[1] +
                      tetra.isCreated[2]+tetra.isCreated[3])] + [volume]
             writer.writerow(data)
+
+        former /= len(tetras)
+        latter = (sum / len(tetras))**2
+
+        writer.writerow(["体積の分散"])
+        writer.writerow([(former-latter)])
 
     print('completed.')
