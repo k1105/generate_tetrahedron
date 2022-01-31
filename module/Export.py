@@ -79,12 +79,22 @@ def Export(tetras, edges, num, threshold, k, d_max, vert, gene_final, time, atte
         writer.writerow(
             [time, attempt, sum[0], sum[1], sum[2], sum[3], sum[4]])
         writer.writerow(["index", "pos0.x", "pos0.y",
-                         "pos0.z", "pos1.x", "pos1.y", "pos1.z", "pos2.x", "pos2.y", "pos2.z", "pos03.x", "pos3.y", "pos3.z", "centroid.x", "centroid.y", "centroid.z", "isCreated"])
+                         "pos0.z", "pos1.x", "pos1.y", "pos1.z", "pos2.x", "pos2.y", "pos2.z", "pos03.x", "pos3.y", "pos3.z", "centroid.x", "centroid.y", "centroid.z", "isCreated", '体積'])
         for tetra in tetras:
-            data = [tetra.index]+tetra.point[0]+tetra.point[1]+tetra.point[2]+tetra.point[3] + \
+            # 体積の計算
+            p0 = tetra.point[0]
+            p1 = tetra.point[1]
+            p2 = tetra.point[2]
+            p3 = tetra.point[3]
+
+            volume = ((p3[0]-p0[0])*((p1[1]-p0[1])*(p2[2]-p0[2])-(p1[2]-p0[2])*(p2[1]-p0[1])) +
+                      (p3[1]-p0[1])*((p1[2]-p0[2])*(p2[0]-p0[0])-(p1[0]-p0[0])*(p2[2]-p0[2])) +
+                      (p3[2]-p0[2])*((p1[0]-p0[0])*(p2[1]-p0[1])-(p1[1]-p0[1])*(p2[0]-p0[0]))) / 6
+
+            data = [tetra.index]+p0+p1+p2+p3 + \
                 list(tetra.centroid) + \
                 [int(tetra.isCreated[0]+tetra.isCreated[1] +
-                     tetra.isCreated[2]+tetra.isCreated[3])]
+                     tetra.isCreated[2]+tetra.isCreated[3])] + [volume]
             writer.writerow(data)
 
     print('completed.')
