@@ -23,12 +23,14 @@ def GenerateObject(num, threshold, k, vert, d_max, gene_array, attempt):
     # 初期化処理終了
 
     # 各ループで生成される四面体の総数を記録
-    last_tetra_num = 1
+    diff = 1
 
-    while last_tetra_num != 0:
-        last_tetra_num = 0
+    while diff != 0:
+        diff = 0
 
-        for tetra in tetras:
+        prev_tetras = tetras.copy()
+
+        for tetra in prev_tetras:
             if LP.norm(tetra.centroid - vert) > d_max:
                 continue
 
@@ -91,7 +93,7 @@ def GenerateObject(num, threshold, k, vert, d_max, gene_array, attempt):
 
                 # 一覧に追加
                 tetras.append(validated_tetra)
-                last_tetra_num += 1
+                diff += 1
 
                 print("\r"+"processing...( number of tetras: " +
                       '{:.1f}'.format(len(tetras))+")", end="")
